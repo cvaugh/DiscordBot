@@ -1,34 +1,34 @@
 package dev.cvaugh.discordbot;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class Main {
     private static final File DATA_DIR = new File("bot");
-    private static final File CONFIG_FILE = new File(DATA_DIR, "config.properties");
-    private static final Map<String, String> CONFIG = new HashMap<>() {
-        {
-            put("bot-token", "YOUR TOKEN HERE");
-            put("command-prefix", "^");
-        }
-    };
+    private static final File CONFIG_FILE = new File(DATA_DIR, "config.json");
+    private static Map<String, String> config =
+            Map.of("bot-token", "YOUR TOKEN HERE", "command-prefix", "^");
     public static JDA jda;
+    public static Gson gson;
 
     public static void main(String[] args) {
+        gson = new Gson();
         try {
             loadConfig();
         } catch(IOException e) {
             throw new RuntimeException(e);
         }
-        JDABuilder builder = JDABuilder.createDefault(CONFIG.get("bot-token"));
+        JDABuilder builder = JDABuilder.createDefault(config.get("bot-token"));
         builder.enableIntents(GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_MEMBERS,
                 GatewayIntent.GUILD_MESSAGE_REACTIONS, GatewayIntent.MESSAGE_CONTENT);
         jda = builder.build();
@@ -41,32 +41,20 @@ public class Main {
         }
         if(!CONFIG_FILE.exists()) {
             writeDefaultConfig();
+            Logger.error("Please enter your bot token in %s", CONFIG_FILE.getAbsolutePath());
+            System.exit(1);
         }
-        List<String> lines = Files.readAllLines(CONFIG_FILE.toPath());
-        for(String line : lines) {
-            if(!(line.isBlank() || line.startsWith("#"))) {
-                String[] split = line.split("=", 2);
-                CONFIG.put(split[0].toLowerCase(), split[1].replace("\\n", "\n"));
-            }
-        }
+        TypeToken<Map<String, String>> mapType = new TypeToken<>() {};
+        String json = Files.readString(CONFIG_FILE.toPath(), StandardCharsets.UTF_8);
+        config = gson.fromJson(json, mapType.getType());
     }
 
     private static void writeDefaultConfig() throws IOException {
-        Files.write(CONFIG_FILE.toPath(), configToString().getBytes());
-    }
-
-    private static String configToString() {
-        StringBuilder sb = new StringBuilder();
-        for(String key : CONFIG.keySet()) {
-            sb.append(key);
-            sb.append('=');
-            sb.append(CONFIG.get(key).replace("\n", "\\n"));
-            sb.append('\n');
-        }
-        return sb.toString();
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        Files.write(CONFIG_FILE.toPath(), gson.toJson(config).getBytes());
     }
 
     public static String commandPrefix() {
-        return CONFIG.getOrDefault("command-prefix", "^");
+        return config.getOrDefault("command-prefix", "^");
     }
 }
