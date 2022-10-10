@@ -17,7 +17,7 @@ public class Main {
     private static final File DATA_DIR = new File("bot");
     private static final File CONFIG_FILE = new File(DATA_DIR, "config.json");
     private static Map<String, String> config =
-            Map.of("bot-token", "YOUR TOKEN HERE", "command-prefix", "^");
+            Map.of("botToken", "YOUR TOKEN HERE", "commandPrefix", "^");
     public static JDA jda;
     public static Gson gson;
 
@@ -28,7 +28,7 @@ public class Main {
         } catch(IOException e) {
             throw new RuntimeException(e);
         }
-        JDABuilder builder = JDABuilder.createDefault(config.get("bot-token"));
+        JDABuilder builder = JDABuilder.createDefault(config.get("botToken"));
         builder.enableIntents(GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_MEMBERS,
                 GatewayIntent.GUILD_MESSAGE_REACTIONS, GatewayIntent.MESSAGE_CONTENT);
         jda = builder.build();
@@ -55,6 +55,6 @@ public class Main {
     }
 
     public static String commandPrefix() {
-        return config.getOrDefault("command-prefix", "^");
+        return config.getOrDefault("commandPrefix", "^");
     }
 }
