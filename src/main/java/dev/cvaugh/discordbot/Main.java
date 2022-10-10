@@ -12,7 +12,8 @@ import java.util.List;
 import java.util.Map;
 
 public class Main {
-    private static final File CONFIG_FILE = new File("config.properties");
+    private static final File DATA_DIR = new File("bot");
+    private static final File CONFIG_FILE = new File(DATA_DIR, "config.properties");
     private static final Map<String, String> CONFIG = new HashMap<>() {
         {
             put("bot-token", "YOUR TOKEN HERE");
@@ -35,6 +36,9 @@ public class Main {
     }
 
     private static void loadConfig() throws IOException {
+        if(!DATA_DIR.exists()) {
+            DATA_DIR.mkdirs();
+        }
         if(!CONFIG_FILE.exists()) {
             writeDefaultConfig();
         }
