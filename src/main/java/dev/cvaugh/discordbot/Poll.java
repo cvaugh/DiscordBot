@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 public class Poll {
-    public static final String[] DEFAULT_LABELS = {};
+    public static final Map<Long, Poll> POLLS = new HashMap<>();
     public long id;
     public long createdAt;
     public long guildId;
@@ -52,10 +52,12 @@ public class Poll {
         }
 
         eb.addField("", sb.toString().trim(), false);
-        eb.addField("",
-                String.format("Created %s\nPoll %s %s", TimeFormat.RELATIVE.format(createdAt),
-                        endTime < System.currentTimeMillis() ? "ended" : "ends",
-                        TimeFormat.RELATIVE.format(endTime)), false);
+        eb.addField("", String.format("Created %s by %s%s", TimeFormat.RELATIVE.format(createdAt),
+                "<@" + creatorId + ">", endTime == 0 ?
+                        "" :
+                        String.format("\nPoll %s %s",
+                                endTime < System.currentTimeMillis() ? "ended" : "ends",
+                                TimeFormat.RELATIVE.format(endTime))), false);
         return eb.build();
     }
 

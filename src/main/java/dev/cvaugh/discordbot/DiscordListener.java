@@ -1,7 +1,12 @@
 package dev.cvaugh.discordbot;
 
+import com.vdurmont.emoji.EmojiManager;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
+import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -47,6 +52,10 @@ public class DiscordListener extends ListenerAdapter {
                             System.currentTimeMillis() - time)).queue());
         }
         case "poll" -> {
+            if(event.getGuild() == null) {
+                event.reply("Polls must be created in a server.").setEphemeral(true).queue();
+                return;
+            }
             List<String> labels = new ArrayList<>();
             List<String> options = new ArrayList<>();
             for(int i = 1; i <= 10; i++) {
@@ -57,16 +66,17 @@ public class DiscordListener extends ListenerAdapter {
                 OptionMapping label = event.getOption("label" + i);
                 if(label != null) {
                     String emoji = label.getAsString();
-                    // TODO validate emoji
+                    if(!EmojiManager.isEmoji(emoji) &&
+                            Utils.getGuildEmoji(emoji, event.getGuild().getIdLong()) == null) {
+                        event.reply("Label `" + emoji + "` must be an emoji.").setEphemeral(true)
+                                .queue();
+                        return;
+                    }
                     labels.add(emoji);
                 } else {
-                    labels.add(Poll.DEFAULT_LABELS[i - 1]);
+                    labels.add(Main.getDefaultPollLabel(i));
                 }
                 options.add(option.getAsString());
-            }
-            if(event.getGuild() == null) {
-                event.reply("Polls must be created in a server.").setEphemeral(true).queue();
-                return;
             }
             OptionMapping title = event.getOption("title");
             if(title == null) {
@@ -93,13 +103,49 @@ public class DiscordListener extends ListenerAdapter {
             event.replyEmbeds(poll.build()).queue(response -> {
                 response.retrieveOriginal().queue(message -> {
                     poll.id = message.getIdLong();
+                    Poll.POLLS.put(poll.id, poll);
                     for(String label : poll.labels) {
-                        message.addReaction(Emoji.fromUnicode(label)).queue();
+                        if(EmojiManager.isEmoji(label)) {
+                            message.addReaction(Emoji.fromUnicode(label)).queue();
+                        } else {
+                            RichCustomEmoji emoji = Utils.getGuildEmoji(label, poll.guildId);
+                            if(emoji == null) {
+                                Logger.error("Emoji not found: %s", label);
+                                return;
+                            }
+                            message.addReaction(emoji).queue();
+                        }
                     }
                 });
             });
         }
         default -> {}
+        }
+    }
+
+    public void onMessageReactionAdd(@NotNull MessageReactionAddEvent event) {
+        if(event.getUser() == null || event.getUser().isBot())
+            return;
+        if(Poll.POLLS.containsKey(event.getMessageIdLong())) {
+            Poll poll = Poll.POLLS.get(event.getMessageIdLong());
+            if(poll.results.containsKey(event.getUserIdLong())) {
+                TextChannel channel = Main.jda.getTextChannelById(poll.channelId);
+                if(channel != null) {
+                    channel.removeReactionById(poll.id, event.getEmoji(), event.getUser()).queue();
+                }
+                return;
+            }
+            poll.results.put(event.getUserIdLong(),
+                    poll.labels.indexOf(event.getEmoji().getFormatted()));
+        }
+    }
+
+    public void onMessageReactionRemove(@NotNull MessageReactionRemoveEvent event) {
+        if(event.getUser() == null || event.getUser().isBot()) {return;}
+        if(Poll.POLLS.containsKey(event.getMessageIdLong())) {
+            Poll poll = Poll.POLLS.get(event.getMessageIdLong());
+            poll.results.remove(event.getUserIdLong(),
+                    poll.labels.indexOf(event.getEmoji().getFormatted()));
         }
     }
 }

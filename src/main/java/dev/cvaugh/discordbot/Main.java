@@ -89,7 +89,7 @@ public class Main {
         Files.write(CONFIG_FILE.toPath(), gson.toJson(config).getBytes());
     }
 
-    public static String commandPrefix() {
-        return config.getOrDefault("commandPrefix", "^");
+    public static String getDefaultPollLabel(int index) {
+        return config.get("defaultPollLabel" + index);
     }
 }

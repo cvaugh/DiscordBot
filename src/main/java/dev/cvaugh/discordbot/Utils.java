@@ -1,5 +1,8 @@
 package dev.cvaugh.discordbot;
 
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
+
 public final class Utils {
     public static long durationToTimestamp(String duration, long relativeTo) {
         String[] split = duration.split(" ");
@@ -32,5 +35,16 @@ public final class Utils {
 
     public static long durationToTimestamp(String duration) {
         return durationToTimestamp(duration, System.currentTimeMillis());
+    }
+
+    public static RichCustomEmoji getGuildEmoji(String s, long guildId) {
+        Guild guild = Main.jda.getGuildById(guildId);
+        if(guild == null) {
+            return null;
+        } else if(s.startsWith("<:") && s.endsWith(">")) {
+            return guild.getEmojiById(s.substring(s.lastIndexOf(':') + 1, s.length() - 1));
+        } else {
+            return null;
+        }
     }
 }
