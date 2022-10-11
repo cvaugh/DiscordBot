@@ -18,6 +18,7 @@ import java.util.Map;
 public class Main {
     private static final File DATA_DIR = new File("bot");
     private static final File CONFIG_FILE = new File(DATA_DIR, "config.json");
+    private static final File POLLS_DIR = new File(DATA_DIR, "polls");
     private static Map<String, String> config =
             Map.of("botToken", "YOUR TOKEN HERE", "commandPrefix", "^");
     public static JDA jda;
@@ -27,8 +28,9 @@ public class Main {
         gson = new Gson();
         try {
             loadConfig();
+            loadPolls();
         } catch(IOException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
         JDABuilder builder = JDABuilder.createDefault(config.get("botToken"));
         builder.enableIntents(GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_MEMBERS,
@@ -76,7 +78,7 @@ public class Main {
         }
         if(!CONFIG_FILE.exists()) {
             writeDefaultConfig();
-            Logger.error("Please enter your bot token in %s", CONFIG_FILE.getAbsolutePath());
+            Logger.error("Please enter your bot token in '%s'", CONFIG_FILE.getAbsolutePath());
             System.exit(1);
         }
         TypeToken<Map<String, String>> mapType = new TypeToken<>() {};
@@ -86,7 +88,26 @@ public class Main {
 
     private static void writeDefaultConfig() throws IOException {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        Files.write(CONFIG_FILE.toPath(), gson.toJson(config).getBytes());
+        Files.writeString(CONFIG_FILE.toPath(), gson.toJson(config));
+    }
+
+    private static void loadPolls() throws IOException {
+        if(!POLLS_DIR.exists())
+            return;
+        for(File file : POLLS_DIR.listFiles()) {
+            Poll poll = gson.fromJson(Files.readString(file.toPath(), StandardCharsets.UTF_8),
+                    Poll.class);
+            Poll.POLLS.put(poll.id, poll);
+        }
+        System.out.println(Poll.POLLS);
+    }
+
+    public static void writePoll(Poll poll) throws IOException {
+        if(!POLLS_DIR.exists()) {
+            POLLS_DIR.mkdir();
+        }
+        File file = new File(POLLS_DIR, poll.id + ".json");
+        Files.writeString(file.toPath(), gson.toJson(poll));
     }
 
     public static String getDefaultPollLabel(int index) {

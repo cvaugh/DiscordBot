@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.utils.TimeFormat;
 
 import java.awt.Color;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,5 +71,17 @@ public class Poll {
             return false;
         channel.editMessageEmbedsById(id, build()).queue();
         return true;
+    }
+
+    public void save() {
+        try {
+            Main.writePoll(this);
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public String toString() {
+        return "<poll:" + id + ">";
     }
 }

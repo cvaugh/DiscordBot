@@ -104,6 +104,7 @@ public class DiscordListener extends ListenerAdapter {
                 response.retrieveOriginal().queue(message -> {
                     poll.id = message.getIdLong();
                     Poll.POLLS.put(poll.id, poll);
+                    poll.save();
                     for(String label : poll.labels) {
                         if(EmojiManager.isEmoji(label)) {
                             message.addReaction(Emoji.fromUnicode(label)).queue();
@@ -137,6 +138,7 @@ public class DiscordListener extends ListenerAdapter {
             }
             poll.results.put(event.getUserIdLong(),
                     poll.labels.indexOf(event.getEmoji().getFormatted()));
+            poll.save();
         }
     }
 
@@ -146,6 +148,7 @@ public class DiscordListener extends ListenerAdapter {
             Poll poll = Poll.POLLS.get(event.getMessageIdLong());
             poll.results.remove(event.getUserIdLong(),
                     poll.labels.indexOf(event.getEmoji().getFormatted()));
+            poll.save();
         }
     }
 }
