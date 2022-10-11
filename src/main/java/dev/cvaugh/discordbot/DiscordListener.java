@@ -31,19 +31,17 @@ public class DiscordListener extends ListenerAdapter {
         String args = splitCommand.length > 1 ? splitCommand[1] : "";
 
         switch(command) {
-        case "ping": {
+        case "ping" -> {
             long time = System.currentTimeMillis();
             event.getChannel().sendMessage("Waiting for response...").queue(response -> {
                 response.editMessageFormat("Response time: %d ms",
                         System.currentTimeMillis() - time).queue();
             });
-            break;
         }
-        case "poll": {
-
-            break;
+        case "poll" -> {
+            System.out.println(args);
         }
-        default: {}
+        default -> {}
         }
     }
 }
