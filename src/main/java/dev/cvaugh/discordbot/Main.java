@@ -5,6 +5,8 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 
 import java.io.File;
@@ -33,6 +35,39 @@ public class Main {
                 GatewayIntent.GUILD_MESSAGE_REACTIONS, GatewayIntent.MESSAGE_CONTENT);
         jda = builder.build();
         jda.addEventListener(new DiscordListener());
+        jda.updateCommands().addCommands(
+                Commands.slash("help", "Sends the bot's help information to you in a DM."),
+                Commands.slash("flipacoin", "Flips a coin.")
+                        .addOption(OptionType.INTEGER, "count", "How many coins to flip.", false),
+                Commands.slash("ping",
+                        "Shows how long it takes for the bot to receive your messages."),
+                Commands.slash("poll", "Creates a poll.")
+                        .addOption(OptionType.STRING, "title", "The title of the poll.", true)
+                        .addOption(OptionType.STRING, "option1", "Poll option 1", true)
+                        .addOption(OptionType.STRING, "option2", "Poll option 2", true)
+                        .addOption(OptionType.STRING, "option3", "Poll option 3", false)
+                        .addOption(OptionType.STRING, "option4", "Poll option 4", false)
+                        .addOption(OptionType.STRING, "option5", "Poll option 5", false)
+                        .addOption(OptionType.STRING, "option6", "Poll option 6", false)
+                        .addOption(OptionType.STRING, "option7", "Poll option 7", false)
+                        .addOption(OptionType.STRING, "option8", "Poll option 8", false)
+                        .addOption(OptionType.STRING, "option9", "Poll option 9", false)
+                        .addOption(OptionType.STRING, "option10", "Poll option 10", false)
+                        .addOption(OptionType.STRING, "label1", "Emoji label for option 1", false)
+                        .addOption(OptionType.STRING, "label2", "Emoji label for option 2", false)
+                        .addOption(OptionType.STRING, "label3", "Emoji label for option 3", false)
+                        .addOption(OptionType.STRING, "label4", "Emoji label for option 4", false)
+                        .addOption(OptionType.STRING, "label5", "Emoji label for option 5", false)
+                        .addOption(OptionType.STRING, "label6", "Emoji label for option 6", false)
+                        .addOption(OptionType.STRING, "label7", "Emoji label for option 7", false)
+                        .addOption(OptionType.STRING, "label8", "Emoji label for option 8", false)
+                        .addOption(OptionType.STRING, "label9", "Emoji label for option 9", false)
+                        .addOption(OptionType.STRING, "label10", "Emoji label for option 10", false)
+                        .addOption(OptionType.STRING, "duration",
+                                "The amount of time until the poll stops accepting new responses.",
+                                false).addOption(OptionType.BOOLEAN, "announce",
+                                "Whether the winning option(s) should be announced when the poll ends.",
+                                false)).queue();
     }
 
     private static void loadConfig() throws IOException {
