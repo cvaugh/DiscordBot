@@ -62,15 +62,20 @@ public class Poll {
         return eb.build();
     }
 
-    public boolean update() {
+    public void update() {
+        if(!closed && ends() && endTime < System.currentTimeMillis()) {
+            closed = true;
+            if(announceResults) {
+                // TODO announce results
+            }
+        }
         Guild guild = Main.jda.getGuildById(guildId);
         if(guild == null)
-            return false;
+            return;
         TextChannel channel = guild.getChannelById(TextChannel.class, channelId);
         if(channel == null)
-            return false;
+            return;
         channel.editMessageEmbedsById(id, build()).queue();
-        return true;
     }
 
     public void save() {
@@ -79,6 +84,10 @@ public class Poll {
         } catch(IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public boolean ends() {
+        return endTime > 0;
     }
 
     public String toString() {

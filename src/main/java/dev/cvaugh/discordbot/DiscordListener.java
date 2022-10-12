@@ -20,6 +20,7 @@ public class DiscordListener extends ListenerAdapter {
     @Override
     public void onReady(@NotNull ReadyEvent event) {
         Logger.info("Ready event received");
+        Main.schedulePollUpdates();
     }
 
     @Override
@@ -66,6 +67,7 @@ public class DiscordListener extends ListenerAdapter {
                 OptionMapping label = event.getOption("label" + i);
                 if(label != null) {
                     String emoji = label.getAsString();
+                    // TODO fix emoji validation
                     if(!EmojiManager.isEmoji(emoji) &&
                             Utils.getGuildEmoji(emoji, event.getGuild().getIdLong()) == null) {
                         event.reply("Label `" + emoji + "` must be an emoji.").setEphemeral(true)
@@ -129,10 +131,11 @@ public class DiscordListener extends ListenerAdapter {
             return;
         if(Poll.POLLS.containsKey(event.getMessageIdLong())) {
             Poll poll = Poll.POLLS.get(event.getMessageIdLong());
-            if(poll.results.containsKey(event.getUserIdLong())) {
+            if(poll.closed || poll.results.containsKey(event.getUserIdLong())) {
                 TextChannel channel = Main.jda.getTextChannelById(poll.channelId);
                 if(channel != null) {
-                    channel.removeReactionById(poll.id, event.getEmoji(), event.getUser()).queue();
+                    channel.removeReactionById(poll.id, event.getEmoji(), event.getUser())
+                            .complete();
                 }
                 return;
             }
@@ -146,6 +149,9 @@ public class DiscordListener extends ListenerAdapter {
         if(event.getUser() == null || event.getUser().isBot()) {return;}
         if(Poll.POLLS.containsKey(event.getMessageIdLong())) {
             Poll poll = Poll.POLLS.get(event.getMessageIdLong());
+            if(poll.closed) {
+                return;
+            }
             poll.results.remove(event.getUserIdLong(),
                     poll.labels.indexOf(event.getEmoji().getFormatted()));
             poll.save();

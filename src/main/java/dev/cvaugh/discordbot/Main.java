@@ -14,15 +14,30 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class Main {
     private static final File DATA_DIR = new File("bot");
     private static final File CONFIG_FILE = new File(DATA_DIR, "config.json");
     private static final File POLLS_DIR = new File(DATA_DIR, "polls");
-    private static Map<String, String> config =
-            Map.of("botToken", "YOUR TOKEN HERE", "commandPrefix", "^");
+    private static final Timer TIMER = new Timer();
+    private static final long POLL_UPDATE_FREQUENCY = 300000L;
+    private static final TimerTask POLL_UPDATE_TASK = new TimerTask() {
+        @Override
+        public void run() {
+            Logger.info("Updating polls");
+            for(Poll poll : Poll.POLLS.values()) {
+                if(poll.ends()) {
+                    poll.update();
+                }
+            }
+        }
+    };
     public static JDA jda;
     public static Gson gson;
+    private static Map<String, String> config =
+            Map.of("botToken", "YOUR TOKEN HERE", "commandPrefix", "^");
 
     public static void main(String[] args) {
         gson = new Gson();
@@ -73,6 +88,7 @@ public class Main {
     }
 
     private static void loadConfig() throws IOException {
+        Logger.info("Loading config");
         if(!DATA_DIR.exists()) {
             DATA_DIR.mkdirs();
         }
@@ -87,11 +103,13 @@ public class Main {
     }
 
     private static void writeDefaultConfig() throws IOException {
+        Logger.info("Writing default config");
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         Files.writeString(CONFIG_FILE.toPath(), gson.toJson(config));
     }
 
     private static void loadPolls() throws IOException {
+        Logger.info("Loading polls");
         if(!POLLS_DIR.exists())
             return;
         for(File file : POLLS_DIR.listFiles()) {
@@ -112,5 +130,9 @@ public class Main {
 
     public static String getDefaultPollLabel(int index) {
         return config.get("defaultPollLabel" + index);
+    }
+
+    public static void schedulePollUpdates() {
+        TIMER.schedule(POLL_UPDATE_TASK, 0L, POLL_UPDATE_FREQUENCY);
     }
 }
