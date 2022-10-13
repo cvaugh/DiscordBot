@@ -1,7 +1,6 @@
 package dev.cvaugh.discordbot;
 
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.utils.TimeFormat;
@@ -63,19 +62,48 @@ public class Poll {
     }
 
     public void update() {
+        TextChannel channel = Main.jda.getChannelById(TextChannel.class, channelId);
+        if(channel == null)
+            return;
         if(!closed && ends() && endTime < System.currentTimeMillis()) {
             closed = true;
             if(announceResults) {
-                // TODO announce results
+                StringBuilder sb = new StringBuilder();
+                Map<Integer, Integer> counts = new HashMap<>();
+                for(long key : results.keySet()) {
+                    counts.put(results.get(key), counts.getOrDefault(results.get(key), 0) + 1);
+                }
+                int max = 0;
+                for(int i : counts.keySet()) {
+                    if(counts.get(i) > max) {
+                        max = counts.get(i);
+                    }
+                }
+                Utils.sortByValue(counts);
+                for(int i : counts.keySet()) {
+                    if(counts.get(i) == max) {
+                        sb.append("**");
+                    }
+                    sb.append(labels.get(i));
+                    sb.append(' ');
+                    sb.append(options.get(i));
+                    sb.append(": ");
+                    if(counts.get(i) == max) {
+                        sb.append("**");
+                    }
+                    sb.append(counts.get(i));
+                    sb.append(" response");
+                    if(counts.get(i) % 2 == 0) {
+                        sb.append("s");
+                    }
+                    sb.append('\n');
+                }
+                channel.sendMessage("**Poll results:**\n" + sb.toString().trim())
+                        .setMessageReference(id).queue();
             }
         }
-        Guild guild = Main.jda.getGuildById(guildId);
-        if(guild == null)
-            return;
-        TextChannel channel = guild.getChannelById(TextChannel.class, channelId);
-        if(channel == null)
-            return;
         channel.editMessageEmbedsById(id, build()).queue();
+        save();
     }
 
     public void save() {

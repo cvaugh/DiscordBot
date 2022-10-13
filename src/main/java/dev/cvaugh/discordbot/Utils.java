@@ -3,6 +3,11 @@ package dev.cvaugh.discordbot;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 public final class Utils {
     public static long durationToTimestamp(String duration, long relativeTo) {
         String[] split = duration.split(" ");
@@ -46,5 +51,20 @@ public final class Utils {
         } else {
             return null;
         }
+    }
+
+    /**
+     * @see <a href="https://stackoverflow.com/a/2581754">Stack Overflow</a>
+     */
+    public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map) {
+        List<Map.Entry<K, V>> list = new ArrayList<>(map.entrySet());
+        list.sort(Map.Entry.comparingByValue());
+
+        Map<K, V> result = new LinkedHashMap<>();
+        for(Map.Entry<K, V> entry : list) {
+            result.put(entry.getKey(), entry.getValue());
+        }
+
+        return result;
     }
 }
