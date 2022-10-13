@@ -34,7 +34,6 @@ public class Main {
     };
     public static JDA jda;
     public static Gson gson;
-    private static Config config = new Config();
 
     public static void main(String[] args) {
         gson = new Gson();
@@ -44,7 +43,7 @@ public class Main {
         } catch(IOException e) {
             e.printStackTrace();
         }
-        JDABuilder builder = JDABuilder.createDefault(config.botToken);
+        JDABuilder builder = JDABuilder.createDefault(Config.getBotToken());
         builder.enableIntents(GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_MEMBERS,
                 GatewayIntent.GUILD_MESSAGE_REACTIONS, GatewayIntent.MESSAGE_CONTENT);
         jda = builder.build();
@@ -95,13 +94,13 @@ public class Main {
             System.exit(1);
         }
         String json = Files.readString(CONFIG_FILE.toPath(), StandardCharsets.UTF_8);
-        config = gson.fromJson(json, Config.class);
+        Config.instance = gson.fromJson(json, Config.class);
     }
 
     private static void writeDefaultConfig() throws IOException {
         Logger.info("Writing default config");
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        Files.writeString(CONFIG_FILE.toPath(), gson.toJson(config));
+        Files.writeString(CONFIG_FILE.toPath(), gson.toJson(Config.instance));
     }
 
     private static void loadPolls() throws IOException {
@@ -121,14 +120,6 @@ public class Main {
         }
         File file = new File(POLLS_DIR, poll.id + ".json");
         Files.writeString(file.toPath(), gson.toJson(poll));
-    }
-
-    public static String getDefaultPollLabel(int index) {
-        if(index >= 0 && index < config.defaultPollLabels.size()) {
-            return config.defaultPollLabels.get(index - 1);
-        } else {
-            return "\u2753";
-        }
     }
 
     public static void schedulePollUpdates() {

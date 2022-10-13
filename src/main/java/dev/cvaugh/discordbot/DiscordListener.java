@@ -76,7 +76,7 @@ public class DiscordListener extends ListenerAdapter {
                     }
                     labels.add(emoji);
                 } else {
-                    labels.add(Main.getDefaultPollLabel(i));
+                    labels.add(Config.getDefaultPollLabel(i - 1));
                 }
                 options.add(option.getAsString());
             }
