@@ -2,7 +2,6 @@ package dev.cvaugh.discordbot;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -13,7 +12,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -36,8 +34,7 @@ public class Main {
     };
     public static JDA jda;
     public static Gson gson;
-    private static Map<String, String> config =
-            Map.of("botToken", "YOUR TOKEN HERE", "commandPrefix", "^");
+    private static Config config = new Config();
 
     public static void main(String[] args) {
         gson = new Gson();
@@ -47,7 +44,7 @@ public class Main {
         } catch(IOException e) {
             e.printStackTrace();
         }
-        JDABuilder builder = JDABuilder.createDefault(config.get("botToken"));
+        JDABuilder builder = JDABuilder.createDefault(config.botToken);
         builder.enableIntents(GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_MEMBERS,
                 GatewayIntent.GUILD_MESSAGE_REACTIONS, GatewayIntent.MESSAGE_CONTENT);
         jda = builder.build();
@@ -97,9 +94,8 @@ public class Main {
             Logger.error("Please enter your bot token in '%s'", CONFIG_FILE.getAbsolutePath());
             System.exit(1);
         }
-        TypeToken<Map<String, String>> mapType = new TypeToken<>() {};
         String json = Files.readString(CONFIG_FILE.toPath(), StandardCharsets.UTF_8);
-        config = gson.fromJson(json, mapType.getType());
+        config = gson.fromJson(json, Config.class);
     }
 
     private static void writeDefaultConfig() throws IOException {
@@ -128,7 +124,11 @@ public class Main {
     }
 
     public static String getDefaultPollLabel(int index) {
-        return config.get("defaultPollLabel" + index);
+        if(index >= 0 && index < config.defaultPollLabels.size()) {
+            return config.defaultPollLabels.get(index - 1);
+        } else {
+            return "\u2753";
+        }
     }
 
     public static void schedulePollUpdates() {
