@@ -79,7 +79,7 @@ public class Poll {
                         max = counts.get(i);
                     }
                 }
-                Utils.sortByValue(counts);
+                counts = Utils.sortByValue(counts);
                 for(int i : counts.keySet()) {
                     if(counts.get(i) == max) {
                         sb.append("**");

@@ -1,9 +1,7 @@
 package dev.cvaugh.discordbot;
 
-import com.vdurmont.emoji.EmojiManager;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
-import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
@@ -67,12 +65,14 @@ public class DiscordListener extends ListenerAdapter {
                 OptionMapping label = event.getOption("label" + i);
                 if(label != null) {
                     String emoji = label.getAsString();
-                    // TODO fix emoji validation
-                    if(!EmojiManager.isEmoji(emoji) &&
-                            Utils.getGuildEmoji(emoji, event.getGuild().getIdLong()) == null) {
-                        event.reply("Label `" + emoji + "` must be an emoji.").setEphemeral(true)
-                                .queue();
-                        return;
+                    Emoji e = Utils.getGuildEmoji(emoji, event.getGuild().getIdLong());
+                    if(e == null) {
+                        if(!Utils.isEmoji(emoji)) {
+                            event.reply(
+                                    "`label" + i + "` must be an emoji. Invalid value: `" + emoji +
+                                            "`").setEphemeral(true).queue();
+                            return;
+                        }
                     }
                     labels.add(emoji);
                 } else {
@@ -102,25 +102,19 @@ public class DiscordListener extends ListenerAdapter {
                 poll.announceResults = announce.getAsBoolean();
             }
 
-            event.replyEmbeds(poll.build()).queue(response -> {
-                response.retrieveOriginal().queue(message -> {
-                    poll.id = message.getIdLong();
-                    Poll.POLLS.put(poll.id, poll);
-                    poll.save();
-                    for(String label : poll.labels) {
-                        if(EmojiManager.isEmoji(label)) {
-                            message.addReaction(Emoji.fromUnicode(label)).queue();
-                        } else {
-                            RichCustomEmoji emoji = Utils.getGuildEmoji(label, poll.guildId);
+            event.replyEmbeds(poll.build())
+                    .queue(response -> response.retrieveOriginal().queue(message -> {
+                        poll.id = message.getIdLong();
+                        Poll.POLLS.put(poll.id, poll);
+                        for(final String label : poll.labels) {
+                            Emoji emoji = Utils.getGuildEmoji(label, poll.guildId);
                             if(emoji == null) {
-                                Logger.error("Emoji not found: %s", label);
-                                return;
+                                emoji = Emoji.fromFormatted(label);
                             }
                             message.addReaction(emoji).queue();
                         }
-                    }
-                });
-            });
+                        poll.save();
+                    }));
         }
         default -> {}
         }

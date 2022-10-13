@@ -67,4 +67,26 @@ public final class Utils {
 
         return result;
     }
+
+    public static boolean isEmoji(String s) {
+        if(s.length() == 0)
+            return false;
+        Character.UnicodeBlock block = Character.UnicodeBlock.of(s.charAt(0));
+        if(block == Character.UnicodeBlock.MISCELLANEOUS_SYMBOLS ||
+                block == Character.UnicodeBlock.DINGBATS ||
+                block == Character.UnicodeBlock.ARROWS) {
+            return true;
+        } else if(Character.isHighSurrogate(s.charAt(0)) && s.length() > 1 &&
+                Character.isSurrogatePair(s.charAt(0), s.charAt(1))) {
+            block = Character.UnicodeBlock.of(surrogatesToCharacter(s.charAt(0), s.charAt(1)));
+            return block == Character.UnicodeBlock.ENCLOSED_ALPHANUMERIC_SUPPLEMENT ||
+                    block == Character.UnicodeBlock.MISCELLANEOUS_SYMBOLS_AND_PICTOGRAPHS;
+        } else {
+            return false;
+        }
+    }
+
+    public static int surrogatesToCharacter(char high, char low) {
+        return (((int) high - 0xD800) << 8) + ((int) low - 0xDC00) + 0xD800 + 0xDC00;
+    }
 }
