@@ -26,9 +26,7 @@ public class Main {
         public void run() {
             Logger.info("Updating polls");
             for(Poll poll : Poll.POLLS.values()) {
-                if(poll.ends()) {
-                    poll.update();
-                }
+                poll.update();
             }
         }
     };

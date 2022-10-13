@@ -3,6 +3,8 @@ package dev.cvaugh.discordbot;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.exceptions.ErrorResponseException;
+import net.dv8tion.jda.api.requests.ErrorResponse;
 import net.dv8tion.jda.api.utils.TimeFormat;
 
 import java.awt.Color;
@@ -66,8 +68,10 @@ public class Poll {
 
     public void update() {
         TextChannel channel = Main.jda.getChannelById(TextChannel.class, channelId);
-        if(channel == null)
+        if(channel == null) {
+            deletePoll(id);
             return;
+        }
         if(!closed && ends() && endTime < System.currentTimeMillis()) {
             closed = true;
             if(announceResults) {
@@ -105,8 +109,17 @@ public class Poll {
                         .setMessageReference(id).queue();
             }
         }
-        channel.editMessageEmbedsById(id, build()).queue();
-        save();
+        channel.editMessageEmbedsById(id, build()).queue(success -> {
+            save();
+        }, error -> {
+            if(error instanceof ErrorResponseException e) {
+                if(e.getErrorResponse() == ErrorResponse.UNKNOWN_MESSAGE) {
+                    deletePoll(id);
+                    return;
+                }
+            }
+            error.printStackTrace();
+        });
     }
 
     public void save() {
