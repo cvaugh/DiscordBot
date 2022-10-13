@@ -1,5 +1,6 @@
 package dev.cvaugh.discordbot;
 
+import java.awt.Color;
 import java.util.List;
 
 public class Config {
@@ -10,6 +11,7 @@ public class Config {
             List.of("\uD83C\uDDE6", "\uD83C\uDDE7", "\uD83C\uDDE8", "\uD83C\uDDE9", "\uD83C\uDDEA",
                     "\uD83C\uDDEB", "\uD83C\uDDEC", "\uD83C\uDDED", "\uD83C\uDDEE", "\uD83C\uDDEF");
     public int maxCoinFlips = 100;
+    public String pollEmbedColor = "4372AA";
 
     public static String getBotToken() {
         return instance.botToken;
@@ -25,5 +27,14 @@ public class Config {
 
     public static int getMaxCoinFlips() {
         return instance.maxCoinFlips;
+    }
+
+    public static Color getPollEmbedColor() {
+        try {
+            return new Color(Integer.parseInt(instance.pollEmbedColor, 16));
+        } catch(NumberFormatException e) {
+            Logger.warn("Invalid color code (pollEmbedColor): %s", instance.pollEmbedColor);
+            return Color.BLACK;
+        }
     }
 }

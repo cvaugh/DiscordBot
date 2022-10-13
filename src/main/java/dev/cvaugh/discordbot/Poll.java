@@ -5,7 +5,6 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.utils.TimeFormat;
 
-import java.awt.Color;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -40,7 +39,7 @@ public class Poll {
 
     public MessageEmbed build() {
         EmbedBuilder eb = new EmbedBuilder();
-        eb.setColor(new Color(0x4372AA));
+        eb.setColor(Config.getPollEmbedColor());
         eb.setTitle("Poll: " + title);
 
         StringBuilder sb = new StringBuilder();
