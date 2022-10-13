@@ -9,6 +9,7 @@ public class Config {
     public List<String> defaultPollLabels =
             List.of("\uD83C\uDDE6", "\uD83C\uDDE7", "\uD83C\uDDE8", "\uD83C\uDDE9", "\uD83C\uDDEA",
                     "\uD83C\uDDEB", "\uD83C\uDDEC", "\uD83C\uDDED", "\uD83C\uDDEE", "\uD83C\uDDEF");
+    public int maxCoinFlips = 100;
 
     public static String getBotToken() {
         return instance.botToken;
@@ -20,5 +21,9 @@ public class Config {
         } else {
             return "\u2753";
         }
+    }
+
+    public static int getMaxCoinFlips() {
+        return instance.maxCoinFlips;
     }
 }

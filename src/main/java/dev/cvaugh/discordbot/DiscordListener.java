@@ -32,9 +32,9 @@ public class DiscordListener extends ListenerAdapter {
         case "flipacoin" -> {
             OptionMapping count = event.getOption("count");
             int flips = count == null ? 1 : count.getAsInt();
-            if(flips < 1 || flips > 100) {
-                event.reply("`count` must be between 1 and 50, inclusive.").setEphemeral(true)
-                        .queue();
+            if(flips < 1 || flips > Config.getMaxCoinFlips()) {
+                event.reply("`count` must be between 1 and " + Config.getMaxCoinFlips() +
+                        ", inclusive.").setEphemeral(true).queue();
             } else if(flips == 1) {
                 event.reply(ThreadLocalRandom.current().nextFloat() > 0.5f ? "Heads!" : "Tails!")
                         .queue();

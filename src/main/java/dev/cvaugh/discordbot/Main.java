@@ -16,9 +16,9 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class Main {
-    private static final File DATA_DIR = new File("bot");
-    private static final File CONFIG_FILE = new File(DATA_DIR, "config.json");
-    private static final File POLLS_DIR = new File(DATA_DIR, "polls");
+    private static final File CONFIG_DIR = new File("bot");
+    private static final File CONFIG_FILE = new File(CONFIG_DIR, "config.json");
+    private static final File POLLS_DIR = new File(CONFIG_DIR, "polls");
     private static final Timer TIMER = new Timer();
     private static final long POLL_UPDATE_FREQUENCY = 300000L;
     private static final TimerTask POLL_UPDATE_TASK = new TimerTask() {
@@ -49,13 +49,13 @@ public class Main {
         jda = builder.build();
         jda.addEventListener(new DiscordListener());
         jda.updateCommands().addCommands(
-                Commands.slash("help", "Sends the bot's help information to you in a DM."),
-                Commands.slash("flipacoin", "Flips a coin.")
-                        .addOption(OptionType.INTEGER, "count", "How many coins to flip.", false),
+                Commands.slash("help", "Sends the bot's help information to you in a DM"),
+                Commands.slash("flipacoin", "Flips a coin")
+                        .addOption(OptionType.INTEGER, "count", "How many coins to flip", false),
                 Commands.slash("ping",
-                        "Shows how long it takes for the bot to receive your messages."),
-                Commands.slash("poll", "Creates a poll.")
-                        .addOption(OptionType.STRING, "title", "The title of the poll.", true)
+                        "Shows how long it takes for the bot to receive your messages"),
+                Commands.slash("poll", "Creates a poll")
+                        .addOption(OptionType.STRING, "title", "The title of the poll", true)
                         .addOption(OptionType.STRING, "option1", "Poll option 1", true)
                         .addOption(OptionType.STRING, "option2", "Poll option 2", true)
                         .addOption(OptionType.STRING, "option3", "Poll option 3", false)
@@ -77,16 +77,20 @@ public class Main {
                         .addOption(OptionType.STRING, "label9", "Emoji label for option 9", false)
                         .addOption(OptionType.STRING, "label10", "Emoji label for option 10", false)
                         .addOption(OptionType.STRING, "duration",
-                                "The amount of time until the poll stops accepting new responses.",
+                                "The amount of time until the poll stops accepting new responses",
                                 false).addOption(OptionType.BOOLEAN, "announce",
-                                "Whether the winning option(s) should be announced when the poll ends.",
+                                "Whether the winning option(s) should be announced when the poll ends",
                                 false)).queue();
     }
 
     private static void loadConfig() throws IOException {
         Logger.info("Loading config");
-        if(!DATA_DIR.exists()) {
-            DATA_DIR.mkdirs();
+        if(!CONFIG_DIR.exists()) {
+            if(!CONFIG_DIR.mkdirs()) {
+                Logger.error("Failed to create config directory at '%s'",
+                        CONFIG_DIR.getAbsolutePath());
+                System.exit(1);
+            }
         }
         if(!CONFIG_FILE.exists()) {
             writeDefaultConfig();
@@ -116,7 +120,11 @@ public class Main {
 
     public static void writePoll(Poll poll) throws IOException {
         if(!POLLS_DIR.exists()) {
-            POLLS_DIR.mkdir();
+            if(!POLLS_DIR.mkdirs()) {
+                Logger.error("Failed to create polls directory at '%s'",
+                        POLLS_DIR.getAbsolutePath());
+                System.exit(1);
+            }
         }
         File file = new File(POLLS_DIR, poll.id + ".json");
         Files.writeString(file.toPath(), gson.toJson(poll));
