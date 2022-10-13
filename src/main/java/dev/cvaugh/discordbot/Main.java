@@ -130,6 +130,13 @@ public class Main {
         Files.writeString(file.toPath(), gson.toJson(poll));
     }
 
+    public static boolean deletePoll(long id) {
+        File file = new File(POLLS_DIR, id + ".json");
+        if(file.exists())
+            return file.delete();
+        return true;
+    }
+
     public static void schedulePollUpdates() {
         TIMER.schedule(POLL_UPDATE_TASK, 0L, POLL_UPDATE_FREQUENCY);
     }

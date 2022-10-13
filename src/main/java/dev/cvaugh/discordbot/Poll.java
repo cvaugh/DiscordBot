@@ -121,4 +121,11 @@ public class Poll {
     public String toString() {
         return "<poll:" + id + ">";
     }
+
+    public static void deletePoll(long id) {
+        if(!POLLS.containsKey(id))
+            return;
+        POLLS.remove(id);
+        Main.deletePoll(id);
+    }
 }

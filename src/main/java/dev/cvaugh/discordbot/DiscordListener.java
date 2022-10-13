@@ -3,6 +3,7 @@ package dev.cvaugh.discordbot;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
@@ -151,6 +152,12 @@ public class DiscordListener extends ListenerAdapter {
                     poll.labels.indexOf(event.getEmoji().getFormatted()));
             poll.update();
             poll.save();
+        }
+    }
+
+    public void onMessageDelete(@NotNull MessageDeleteEvent event) {
+        if(Poll.POLLS.containsKey(event.getMessageIdLong())) {
+            Poll.deletePoll(event.getMessageIdLong());
         }
     }
 }
