@@ -80,7 +80,8 @@ public class Main {
                                 "The amount of time until the poll stops accepting new responses",
                                 false).addOption(OptionType.BOOLEAN, "announce",
                                 "Whether the winning option(s) should be announced when the poll ends",
-                                false)).queue();
+                                false).addOption(OptionType.STRING, "color",
+                                "The hexadecimal accent color of the poll's embed (i.e. 4372AA)")).queue();
     }
 
     private static void loadConfig() throws IOException {

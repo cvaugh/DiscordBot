@@ -102,6 +102,19 @@ public class DiscordListener extends ListenerAdapter {
             if(announce != null) {
                 poll.announceResults = announce.getAsBoolean();
             }
+            OptionMapping color = event.getOption("color");
+            if(color != null) {
+                String accentColor = color.getAsString();
+                if(accentColor.startsWith("#"))
+                    accentColor = accentColor.substring(1);
+                try {
+                    poll.accentColor = Integer.parseInt(accentColor, 16);
+                } catch(NumberFormatException e) {
+                    event.reply("Invalid color code: `" + color.getAsString() + "`")
+                            .setEphemeral(true).queue();
+                    return;
+                }
+            }
 
             event.replyEmbeds(poll.build())
                     .queue(response -> response.retrieveOriginal().queue(message -> {

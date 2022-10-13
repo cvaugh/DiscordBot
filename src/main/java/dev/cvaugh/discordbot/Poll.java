@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.utils.TimeFormat;
 
+import java.awt.Color;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -24,6 +25,7 @@ public class Poll {
     public long endTime = 0;
     public boolean announceResults = false;
     public boolean closed = false;
+    public int accentColor = Integer.MAX_VALUE;
 
     public Poll(long guildId, long channelId, long creatorId, String title, List<String> labels,
             List<String> options) {
@@ -39,7 +41,9 @@ public class Poll {
 
     public MessageEmbed build() {
         EmbedBuilder eb = new EmbedBuilder();
-        eb.setColor(Config.getPollEmbedColor());
+        eb.setColor(accentColor == Integer.MAX_VALUE ?
+                Config.getPollEmbedColor() :
+                new Color(accentColor));
         eb.setTitle("Poll: " + title);
 
         StringBuilder sb = new StringBuilder();
