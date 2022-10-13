@@ -141,6 +141,7 @@ public class DiscordListener extends ListenerAdapter {
             }
             poll.results.put(event.getUserIdLong(),
                     poll.labels.indexOf(event.getEmoji().getFormatted()));
+            poll.update();
             poll.save();
         }
     }
@@ -154,6 +155,7 @@ public class DiscordListener extends ListenerAdapter {
             }
             poll.results.remove(event.getUserIdLong(),
                     poll.labels.indexOf(event.getEmoji().getFormatted()));
+            poll.update();
             poll.save();
         }
     }

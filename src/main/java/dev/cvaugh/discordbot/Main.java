@@ -117,7 +117,6 @@ public class Main {
                     Poll.class);
             Poll.POLLS.put(poll.id, poll);
         }
-        System.out.println(Poll.POLLS);
     }
 
     public static void writePoll(Poll poll) throws IOException {
