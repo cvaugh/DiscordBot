@@ -54,7 +54,7 @@ public class Main {
         jda = builder.build();
         jda.addEventListener(new DiscordListener());
         jda.updateCommands().addCommands(
-                Commands.slash("help", "Sends the bot's help information to you in a DM"),
+                Commands.slash("help", "Shows the bot's documentation"),
                 Commands.slash("flipacoin", "Flips a coin")
                         .addOption(OptionType.INTEGER, "count", "How many coins to flip", false),
                 Commands.slash("ping",
