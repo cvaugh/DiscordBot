@@ -37,8 +37,8 @@ public class DiscordListener extends ListenerAdapter {
         case "help" -> {
             event.getUser().openPrivateChannel().queue(channel -> {
                 channel.sendMessage(Main.helpText).queue();
-                event.reply("The bot's help information has been sent to you in a DM.")
-                        .setEphemeral(true).queue();
+                event.reply("The bot's help information has been sent to you in a DM, " +
+                        event.getUser().getName() + ".").setEphemeral(true).queue();
             });
         }
         case "flipacoin" -> {
