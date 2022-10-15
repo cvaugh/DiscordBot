@@ -35,7 +35,11 @@ public class DiscordListener extends ListenerAdapter {
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
         switch(event.getName()) {
         case "help" -> {
-            // TODO
+            event.getUser().openPrivateChannel().queue(channel -> {
+                channel.sendMessage(Main.helpText).queue();
+                event.reply("The bot's help information has been sent to you in a DM.")
+                        .setEphemeral(true).queue();
+            });
         }
         case "flipacoin" -> {
             OptionMapping count = event.getOption("count");

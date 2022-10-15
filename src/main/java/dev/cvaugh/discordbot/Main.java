@@ -8,12 +8,16 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.stream.Collectors;
 
 public class Main {
     private static final File CONFIG_DIR = new File("bot");
@@ -32,10 +36,12 @@ public class Main {
     };
     public static JDA jda;
     public static Gson gson;
+    public static String helpText = "";
 
     public static void main(String[] args) {
         gson = new Gson();
         try {
+            readHelpText();
             loadConfig();
             loadGuilds();
             loadPolls();
@@ -111,6 +117,16 @@ public class Main {
         Logger.info("Writing default config");
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         Files.writeString(CONFIG_FILE.toPath(), gson.toJson(Config.instance));
+    }
+
+    private static void readHelpText() throws IOException {
+        InputStream in = Main.class.getResourceAsStream("/help.md");
+        if(in == null)
+            return;
+        BufferedReader reader =
+                new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
+        helpText = String.join("\n", reader.lines().collect(Collectors.joining()));
+        in.close();
     }
 
     private static void loadPolls() throws IOException {
