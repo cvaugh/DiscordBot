@@ -5,7 +5,7 @@ public final class Logger {
         System.out.printf("[info] %s%n", s);
     }
 
-    public static void info(String s, String... args) {
+    public static void info(String s, Object... args) {
         info(String.format(s, args));
     }
 
@@ -13,7 +13,7 @@ public final class Logger {
         System.out.printf("[warn] %s%n", s);
     }
 
-    public static void warn(String s, String... args) {
+    public static void warn(String s, Object... args) {
         warn(String.format(s, args));
     }
 
@@ -21,7 +21,7 @@ public final class Logger {
         System.err.printf("[error] %s%n", s);
     }
 
-    public static void error(String s, String... args) {
+    public static void error(String s, Object... args) {
         warn(String.format(s, args));
     }
 }
