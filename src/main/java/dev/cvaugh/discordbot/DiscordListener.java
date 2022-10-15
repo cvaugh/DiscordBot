@@ -1,7 +1,9 @@
 package dev.cvaugh.discordbot;
 
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
@@ -19,6 +21,13 @@ public class DiscordListener extends ListenerAdapter {
     @Override
     public void onReady(@NotNull ReadyEvent event) {
         Logger.info("Ready event received");
+        for(Guild guild : Main.jda.getGuilds()) {
+            long id = guild.getIdLong();
+            if(!Guilds.hasEntry(id)) {
+                Logger.warn("Creating missing settings.json for guild %d", id);
+                Guilds.put(id);
+            }
+        }
         Main.schedulePollUpdates();
     }
 
@@ -130,10 +139,14 @@ public class DiscordListener extends ListenerAdapter {
                         poll.save();
                     }));
         }
+        case "settings" -> {
+            // TODO settings command
+        }
         default -> {}
         }
     }
 
+    @Override
     public void onMessageReactionAdd(@NotNull MessageReactionAddEvent event) {
         if(event.getUser() == null || event.getUser().isBot())
             return;
@@ -154,6 +167,7 @@ public class DiscordListener extends ListenerAdapter {
         }
     }
 
+    @Override
     public void onMessageReactionRemove(@NotNull MessageReactionRemoveEvent event) {
         if(event.getUser() == null || event.getUser().isBot()) {return;}
         if(Poll.POLLS.containsKey(event.getMessageIdLong())) {
@@ -168,9 +182,17 @@ public class DiscordListener extends ListenerAdapter {
         }
     }
 
+    @Override
     public void onMessageDelete(@NotNull MessageDeleteEvent event) {
         if(Poll.POLLS.containsKey(event.getMessageIdLong())) {
             Poll.deletePoll(event.getMessageIdLong());
         }
+    }
+
+    @Override
+    public void onGuildJoin(@NotNull GuildJoinEvent event) {
+        Logger.info("Joined guild: %s (ID %d)", event.getGuild().getName(),
+                event.getGuild().getIdLong());
+        Guilds.put(event.getGuild().getIdLong());
     }
 }

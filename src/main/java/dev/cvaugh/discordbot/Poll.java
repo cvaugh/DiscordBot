@@ -1,6 +1,7 @@
 package dev.cvaugh.discordbot;
 
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
@@ -42,9 +43,14 @@ public class Poll {
     }
 
     public MessageEmbed build() {
+        Guild guild = Main.jda.getGuildById(guildId);
+        if(guild == null) {
+            deletePoll(id);
+            return null;
+        }
         EmbedBuilder eb = new EmbedBuilder();
         eb.setColor(accentColor == Integer.MAX_VALUE ?
-                Config.getPollEmbedColor() :
+                Guilds.get(guildId).getPollEmbedColor() :
                 new Color(accentColor));
         eb.setTitle("Poll: " + title);
 
@@ -67,7 +73,12 @@ public class Poll {
     }
 
     public void update() {
-        TextChannel channel = Main.jda.getChannelById(TextChannel.class, channelId);
+        Guild guild = Main.jda.getGuildById(guildId);
+        if(guild == null) {
+            deletePoll(id);
+            return;
+        }
+        TextChannel channel = guild.getChannelById(TextChannel.class, channelId);
         if(channel == null) {
             deletePoll(id);
             return;

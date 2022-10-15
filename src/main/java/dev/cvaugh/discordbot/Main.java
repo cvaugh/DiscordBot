@@ -19,12 +19,12 @@ public class Main {
     private static final File CONFIG_DIR = new File("bot");
     private static final File CONFIG_FILE = new File(CONFIG_DIR, "config.json");
     private static final File POLLS_DIR = new File(CONFIG_DIR, "polls");
+    private static final File GUILDS_DIR = new File(CONFIG_DIR, "guilds");
     private static final Timer TIMER = new Timer();
     private static final long POLL_UPDATE_FREQUENCY = 300000L;
     private static final TimerTask POLL_UPDATE_TASK = new TimerTask() {
         @Override
         public void run() {
-            Logger.info("Updating polls");
             for(Poll poll : Poll.POLLS.values()) {
                 poll.update();
             }
@@ -37,6 +37,7 @@ public class Main {
         gson = new Gson();
         try {
             loadConfig();
+            loadGuilds();
             loadPolls();
         } catch(IOException e) {
             e.printStackTrace();
@@ -79,7 +80,13 @@ public class Main {
                                 false).addOption(OptionType.BOOLEAN, "announce",
                                 "Whether the winning option(s) should be announced when the poll ends",
                                 false).addOption(OptionType.STRING, "color",
-                                "The hexadecimal accent color of the poll's embed (i.e. 4372AA)")).queue();
+                                "The hexadecimal accent color of the poll's embed (e.g. 4372AA)"),
+                Commands.slash("settings", "Modifies server settings for the bot.")
+                        .addOption(OptionType.ROLE, "poll-role",
+                                "Users with this role can create polls.", false)
+                        .addOption(OptionType.STRING, "default-poll-color",
+                                "The default hexadecimal accent color for poll embeds (e.g. 4372AA)",
+                                false)).queue();
     }
 
     private static void loadConfig() throws IOException {
@@ -118,12 +125,9 @@ public class Main {
     }
 
     public static void writePoll(Poll poll) throws IOException {
-        if(!POLLS_DIR.exists()) {
-            if(!POLLS_DIR.mkdirs()) {
-                Logger.error("Failed to create polls directory at '%s'",
-                        POLLS_DIR.getAbsolutePath());
-                System.exit(1);
-            }
+        if(!POLLS_DIR.exists() && !POLLS_DIR.mkdir()) {
+            Logger.error("Failed to create polls directory at '%s'", POLLS_DIR.getAbsolutePath());
+            System.exit(1);
         }
         File file = new File(POLLS_DIR, poll.id + ".json");
         Files.writeString(file.toPath(), gson.toJson(poll));
@@ -134,6 +138,37 @@ public class Main {
         if(file.exists())
             return file.delete();
         return true;
+    }
+
+    private static void loadGuilds() throws IOException {
+        if(!GUILDS_DIR.exists() && !GUILDS_DIR.mkdir()) {
+            Logger.error("Failed to guild data directory at '%s'", GUILDS_DIR.getAbsolutePath());
+            System.exit(1);
+        }
+        for(File file : GUILDS_DIR.listFiles()) {
+            if(file.isDirectory()) {
+                File settingsFile = new File(file, "settings.json");
+                GuildSettings settings = gson.fromJson(
+                        Files.readString(settingsFile.toPath(), StandardCharsets.UTF_8),
+                        GuildSettings.class);
+                Guilds.put(settings.id, settings, false);
+            }
+        }
+    }
+
+    private static File getGuildDir(long guildId) {
+        File dir = new File(GUILDS_DIR, String.valueOf(guildId));
+        if(!dir.exists() && !dir.mkdir()) {
+            Logger.error("Failed to create directory for guild %d at '%s'", guildId,
+                    dir.getAbsolutePath());
+            System.exit(1);
+        }
+        return dir;
+    }
+
+    public static void writeGuildSettings(long guildId) throws IOException {
+        Files.writeString(new File(getGuildDir(guildId), "settings.json").toPath(),
+                gson.toJson(Guilds.get(guildId)));
     }
 
     public static void schedulePollUpdates() {
