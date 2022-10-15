@@ -7,7 +7,7 @@ public class Config {
     public static Config instance = new Config();
 
     public String botToken = "YOUR TOKEN HERE";
-    public List<String> defaultPollLabels =
+    public List<String> defaultEmojiLabels =
             List.of("\uD83C\uDDE6", "\uD83C\uDDE7", "\uD83C\uDDE8", "\uD83C\uDDE9", "\uD83C\uDDEA",
                     "\uD83C\uDDEB", "\uD83C\uDDEC", "\uD83C\uDDED", "\uD83C\uDDEE", "\uD83C\uDDEF");
     public int maxCoinFlips = 100;
@@ -17,9 +17,9 @@ public class Config {
         return instance.botToken;
     }
 
-    public static String getDefaultPollLabel(int index) {
-        if(index >= 0 && index < instance.defaultPollLabels.size()) {
-            return instance.defaultPollLabels.get(index);
+    public static String getDefaultEmojiLabel(int index) {
+        if(index >= 0 && index < instance.defaultEmojiLabels.size()) {
+            return instance.defaultEmojiLabels.get(index);
         } else {
             return "\u2753";
         }

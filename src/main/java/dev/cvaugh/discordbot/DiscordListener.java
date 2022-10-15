@@ -130,7 +130,7 @@ public class DiscordListener extends ListenerAdapter {
                     }
                     labels.add(emoji);
                 } else {
-                    labels.add(Config.getDefaultPollLabel(i - 1));
+                    labels.add(Config.getDefaultEmojiLabel(i - 1));
                 }
                 options.add(option.getAsString());
             }
