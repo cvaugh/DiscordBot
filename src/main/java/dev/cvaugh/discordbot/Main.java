@@ -32,6 +32,7 @@ public class Main {
     private static final TimerTask UPDATE_TASK = new TimerTask() {
         @Override
         public void run() {
+            logger.debug("Running update task");
             for(Poll poll : Poll.REGISTRY.values()) {
                 poll.update();
             }
@@ -43,7 +44,7 @@ public class Main {
     public static String helpText = "";
 
     public static void main(String[] args) {
-        logger = LoggerFactory.getLogger("dev.cvaugh.discordbot.Main");
+        logger = LoggerFactory.getLogger("Bot");
         gson = new Gson();
         try {
             readHelpText();
@@ -54,11 +55,13 @@ public class Main {
         } catch(IOException e) {
             e.printStackTrace();
         }
+        logger.debug("Building JDA instance");
         JDABuilder builder = JDABuilder.createDefault(Config.getBotToken());
         builder.enableIntents(GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_MEMBERS,
                 GatewayIntent.GUILD_MESSAGE_REACTIONS, GatewayIntent.MESSAGE_CONTENT);
         builder.setMemberCachePolicy(MemberCachePolicy.ALL);
         jda = builder.build();
+        logger.debug("Registering commands");
         jda.addEventListener(new DiscordListener());
         jda.updateCommands().addCommands(Commands.slash("help", "Shows the bot's documentation"),
                 Commands.slash("flipacoin", "Flips a coin")
@@ -145,6 +148,7 @@ public class Main {
                                 "Send a message when a user leaves the server", false)
                         .addOption(OptionType.CHANNEL, "leave-message-channel",
                                 "The channel in which to send leave messages", false)).queue();
+        logger.debug("Registering shutdown hook");
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             logger.info("Saving guild settings");
             Guilds.getAll().forEach(GuildSettings::save);
@@ -159,6 +163,7 @@ public class Main {
     private static void loadConfig() throws IOException {
         logger.info("Loading config");
         if(!CONFIG_DIR.exists()) {
+            logger.debug("Creating missing config directory at '{}'", CONFIG_DIR.getAbsolutePath());
             if(!CONFIG_DIR.mkdirs()) {
                 logger.error("Failed to create config directory at '{}'",
                         CONFIG_DIR.getAbsolutePath());
@@ -175,12 +180,13 @@ public class Main {
     }
 
     private static void writeDefaultConfig() throws IOException {
-        logger.info("Writing default config");
+        logger.info("Writing default config to '{}'", CONFIG_FILE.getAbsolutePath());
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         Files.writeString(CONFIG_FILE.toPath(), gson.toJson(Config.instance));
     }
 
     private static void readHelpText() throws IOException {
+        logger.debug("Reading help message from /help.md");
         InputStream in = Main.class.getResourceAsStream("/help.md");
         if(in == null)
             return;
@@ -195,6 +201,7 @@ public class Main {
         if(!POLLS_DIR.exists())
             return;
         for(File file : POLLS_DIR.listFiles()) {
+            logger.debug("Loading poll {}", file.getName());
             Poll poll = gson.fromJson(Files.readString(file.toPath(), StandardCharsets.UTF_8),
                     Poll.class);
             Poll.REGISTRY.put(poll.id, poll);
@@ -202,6 +209,7 @@ public class Main {
     }
 
     public static void writePoll(Poll poll) throws IOException {
+        logger.debug("Writing poll {}", poll.id);
         if(!POLLS_DIR.exists() && !POLLS_DIR.mkdir()) {
             logger.error("Failed to create polls directory at '{}'", POLLS_DIR.getAbsolutePath());
             System.exit(1);
@@ -211,6 +219,7 @@ public class Main {
     }
 
     public static boolean deletePoll(long id) {
+        logger.debug("Deleting poll {}", id);
         File file = new File(POLLS_DIR, id + ".json");
         if(file.exists())
             return file.delete();
@@ -222,6 +231,7 @@ public class Main {
         if(!ROLE_ASSIGNERS_DIR.exists())
             return;
         for(File file : ROLE_ASSIGNERS_DIR.listFiles()) {
+            logger.debug("Loading role assigner {}", file.getName());
             RoleAssigner roleAssigner =
                     gson.fromJson(Files.readString(file.toPath(), StandardCharsets.UTF_8),
                             RoleAssigner.class);
@@ -230,6 +240,7 @@ public class Main {
     }
 
     public static void writeRoleAssigner(RoleAssigner roleAssigner) throws IOException {
+        logger.debug("Writing role assigner {}", roleAssigner.id);
         if(!ROLE_ASSIGNERS_DIR.exists() && !ROLE_ASSIGNERS_DIR.mkdir()) {
             logger.error("Failed to create role assigners directory at '{}'",
                     ROLE_ASSIGNERS_DIR.getAbsolutePath());
@@ -240,6 +251,7 @@ public class Main {
     }
 
     public static boolean deleteRoleAssigner(long id) {
+        logger.debug("Deleting role assigner {}", id);
         File file = new File(ROLE_ASSIGNERS_DIR, id + ".json");
         if(file.exists())
             return file.delete();
@@ -247,12 +259,14 @@ public class Main {
     }
 
     private static void loadGuilds() throws IOException {
+        logger.info("Loading guilds");
         if(!GUILDS_DIR.exists() && !GUILDS_DIR.mkdir()) {
             logger.error("Failed to guild data directory at '{}'", GUILDS_DIR.getAbsolutePath());
             System.exit(1);
         }
         for(File file : GUILDS_DIR.listFiles()) {
             if(file.isDirectory()) {
+                logger.debug("Loading guild " + file.getName());
                 File settingsFile = new File(file, "settings.json");
                 GuildSettings settings = gson.fromJson(
                         Files.readString(settingsFile.toPath(), StandardCharsets.UTF_8),
@@ -274,15 +288,18 @@ public class Main {
     }
 
     public static void writeGuildSettings(long guildId) throws IOException {
+        logger.debug("Writing settings for guild {}", guildId);
         Files.writeString(new File(getGuildDir(guildId), "settings.json").toPath(),
                 gson.toJson(Guilds.get(guildId)));
     }
 
     public static void scheduleUpdateTask() {
+        logger.debug("Scheduling update task");
         TIMER.schedule(UPDATE_TASK, 0L, Config.instance.updateTimerPeriod * 1000L);
     }
 
     public static void scheduleMuteTask(long guildId, long userId, long endTime) {
+        logger.debug("Scheduling mute task [{}, {}, {}]", guildId, userId, endTime);
         TIMER.schedule(new TimerTask() {
             @Override
             public void run() {

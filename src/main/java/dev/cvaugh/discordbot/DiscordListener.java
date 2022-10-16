@@ -44,6 +44,8 @@ public class DiscordListener extends ListenerAdapter {
 
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
+        Main.logger.debug("SlashCommandInteractionEvent: [{}, {}, {}]", event.getName(),
+                event.getGuild(), event.getUser());
         switch(event.getName()) {
         case "help" -> event.reply(Main.helpText).setEphemeral(true).queue();
         case "flipacoin" -> {
