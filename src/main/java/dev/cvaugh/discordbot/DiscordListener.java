@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
+import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
@@ -99,11 +100,9 @@ public class DiscordListener extends ListenerAdapter {
             if(pollRole != null) {
                 noArgs = false;
                 Role role = pollRole.getAsRole();
-                if(role.getAsMention().equals("@everyone")) {
-                    settings.roleToCreatePoll = 0;
-                } else {
-                    settings.roleToCreatePoll = role.getIdLong();
-                }
+                settings.roleToCreatePoll =
+                        role.getAsMention().equals("@everyone") ? 0 : role.getIdLong();
+                ;
                 event.reply("The role required to create polls is now " + role.getAsMention() + ".")
                         .setEphemeral(true).queue();
             }
@@ -125,6 +124,15 @@ public class DiscordListener extends ListenerAdapter {
                             .setEphemeral(true).queue();
                     return;
                 }
+            }
+            OptionMapping autoAssignRole = event.getOption("auto-assign-role");
+            if(autoAssignRole != null) {
+                noArgs = false;
+                Role role = autoAssignRole.getAsRole();
+                settings.autoAssignRole =
+                        role.getAsMention().equals("@everyone") ? 0 : role.getIdLong();
+                event.reply("Auto-assign role set to " + role.getAsMention()).setEphemeral(true)
+                        .queue();
             }
             if(noArgs) {
                 event.reply("No arguments were supplied.").setEphemeral(true).queue();
@@ -175,6 +183,24 @@ public class DiscordListener extends ListenerAdapter {
         Logger.info("Joined guild: %s (ID %d)", event.getGuild().getName(),
                 event.getGuild().getIdLong());
         Guilds.put(event.getGuild().getIdLong());
+    }
+
+    @Override
+    public void onGuildMemberJoin(@NotNull GuildMemberJoinEvent event) {
+        long roleId = Guilds.get(event.getGuild().getIdLong()).autoAssignRole;
+        Role role = event.getGuild().getRoleById(roleId);
+        System.out.println("event.getMember() = " + event.getMember());
+        System.out.println(
+                "event.getMember().getAsMention() = " + event.getMember().getAsMention());
+        System.out.println(
+                "event.getMember().getActiveClients() = " + event.getMember().getActiveClients());
+        System.out.println(
+                "event.getMember().getTimeCreated() = " + event.getMember().getTimeCreated());
+        if(role == null)
+            return;
+        event.getGuild()
+                .modifyMemberRoles(event.getMember(), List.of(role), Collections.emptyList())
+                .queue();
     }
 
     private static void handlePollCommand(SlashCommandInteractionEvent event) {

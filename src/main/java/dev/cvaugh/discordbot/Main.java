@@ -56,71 +56,73 @@ public class Main {
         jda = builder.build();
         jda.addEventListener(new DiscordListener());
         jda.updateCommands().addCommands(Commands.slash("help", "Shows the bot's documentation"),
-                Commands.slash("flipacoin", "Flips a coin")
-                        .addOption(OptionType.INTEGER, "count", "How many coins to flip", false),
-                Commands.slash("ping",
-                        "Shows how long it takes for the bot to receive your messages"),
-                Commands.slash("poll", "Creates a poll")
-                        .addOption(OptionType.STRING, "title", "The title of the poll", true)
-                        .addOption(OptionType.STRING, "option1", "Poll option 1", true)
-                        .addOption(OptionType.STRING, "option2", "Poll option 2", true)
-                        .addOption(OptionType.STRING, "option3", "Poll option 3", false)
-                        .addOption(OptionType.STRING, "option4", "Poll option 4", false)
-                        .addOption(OptionType.STRING, "option5", "Poll option 5", false)
-                        .addOption(OptionType.STRING, "option6", "Poll option 6", false)
-                        .addOption(OptionType.STRING, "option7", "Poll option 7", false)
-                        .addOption(OptionType.STRING, "option8", "Poll option 8", false)
-                        .addOption(OptionType.STRING, "option9", "Poll option 9", false)
-                        .addOption(OptionType.STRING, "option10", "Poll option 10", false)
-                        .addOption(OptionType.STRING, "label1", "Emoji label for option 1", false)
-                        .addOption(OptionType.STRING, "label2", "Emoji label for option 2", false)
-                        .addOption(OptionType.STRING, "label3", "Emoji label for option 3", false)
-                        .addOption(OptionType.STRING, "label4", "Emoji label for option 4", false)
-                        .addOption(OptionType.STRING, "label5", "Emoji label for option 5", false)
-                        .addOption(OptionType.STRING, "label6", "Emoji label for option 6", false)
-                        .addOption(OptionType.STRING, "label7", "Emoji label for option 7", false)
-                        .addOption(OptionType.STRING, "label8", "Emoji label for option 8", false)
-                        .addOption(OptionType.STRING, "label9", "Emoji label for option 9", false)
-                        .addOption(OptionType.STRING, "label10", "Emoji label for option 10", false)
-                        .addOption(OptionType.STRING, "duration",
-                                "The amount of time until the poll stops accepting new responses",
-                                false).addOption(OptionType.BOOLEAN, "announce",
-                                "Whether the winning option(s) should be announced when the poll ends",
-                                false).addOption(OptionType.STRING, "color",
-                                "The hexadecimal accent color of the poll's embed (e.g. 4372AA)"),
-                Commands.slash("role-assigner",
-                                "Allows users to self-assign roles by reacting to a message")
-                        .addOption(OptionType.STRING, "title", "The title of the role assigner",
-                                true).addOption(OptionType.ROLE, "role1", "Role 1", true)
-                        .addOption(OptionType.ROLE, "role2", "Role 2", false)
-                        .addOption(OptionType.ROLE, "role3", "Role 3", false)
-                        .addOption(OptionType.ROLE, "role4", "Role 4", false)
-                        .addOption(OptionType.ROLE, "role5", "Role 5", false)
-                        .addOption(OptionType.ROLE, "role6", "Role 6", false)
-                        .addOption(OptionType.ROLE, "role7", "Role 7", false)
-                        .addOption(OptionType.ROLE, "role8", "Role 8", false)
-                        .addOption(OptionType.ROLE, "role9", "Role 9", false)
-                        .addOption(OptionType.ROLE, "role10", "Role 10", false)
-                        .addOption(OptionType.STRING, "label1", "Emoji label for role 1", false)
-                        .addOption(OptionType.STRING, "label2", "Emoji label for role 2", false)
-                        .addOption(OptionType.STRING, "label3", "Emoji label for role 3", false)
-                        .addOption(OptionType.STRING, "label4", "Emoji label for role 4", false)
-                        .addOption(OptionType.STRING, "label5", "Emoji label for role 5", false)
-                        .addOption(OptionType.STRING, "label6", "Emoji label for role 6", false)
-                        .addOption(OptionType.STRING, "label7", "Emoji label for role 7", false)
-                        .addOption(OptionType.STRING, "label8", "Emoji label for role 8", false)
-                        .addOption(OptionType.STRING, "label9", "Emoji label for role 9", false)
-                        .addOption(OptionType.STRING, "label10", "Emoji label for role 10", false)
-                        .addOption(OptionType.STRING, "color",
-                                "The hexadecimal accent color of the role assigner's embed (e.g. 4372AA)")
-                        .addOption(OptionType.STRING, "image",
-                                "The URL of an image to use as a thumbnail"),
-                Commands.slash("settings", "Modifies server settings for the bot")
-                        .addOption(OptionType.ROLE, "poll-role",
-                                "Users with this role can create polls.", false)
-                        .addOption(OptionType.STRING, "default-poll-color",
-                                "The default hexadecimal accent color for poll embeds (e.g. 4372AA)",
-                                false)).queue();
+                        Commands.slash("flipacoin", "Flips a coin")
+                                .addOption(OptionType.INTEGER, "count", "How many coins to flip", false),
+                        Commands.slash("ping",
+                                "Shows how long it takes for the bot to receive your messages"),
+                        Commands.slash("poll", "Creates a poll")
+                                .addOption(OptionType.STRING, "title", "The title of the poll", true)
+                                .addOption(OptionType.STRING, "option1", "Poll option 1", true)
+                                .addOption(OptionType.STRING, "option2", "Poll option 2", true)
+                                .addOption(OptionType.STRING, "option3", "Poll option 3", false)
+                                .addOption(OptionType.STRING, "option4", "Poll option 4", false)
+                                .addOption(OptionType.STRING, "option5", "Poll option 5", false)
+                                .addOption(OptionType.STRING, "option6", "Poll option 6", false)
+                                .addOption(OptionType.STRING, "option7", "Poll option 7", false)
+                                .addOption(OptionType.STRING, "option8", "Poll option 8", false)
+                                .addOption(OptionType.STRING, "option9", "Poll option 9", false)
+                                .addOption(OptionType.STRING, "option10", "Poll option 10", false)
+                                .addOption(OptionType.STRING, "label1", "Emoji label for option 1", false)
+                                .addOption(OptionType.STRING, "label2", "Emoji label for option 2", false)
+                                .addOption(OptionType.STRING, "label3", "Emoji label for option 3", false)
+                                .addOption(OptionType.STRING, "label4", "Emoji label for option 4", false)
+                                .addOption(OptionType.STRING, "label5", "Emoji label for option 5", false)
+                                .addOption(OptionType.STRING, "label6", "Emoji label for option 6", false)
+                                .addOption(OptionType.STRING, "label7", "Emoji label for option 7", false)
+                                .addOption(OptionType.STRING, "label8", "Emoji label for option 8", false)
+                                .addOption(OptionType.STRING, "label9", "Emoji label for option 9", false)
+                                .addOption(OptionType.STRING, "label10", "Emoji label for option 10", false)
+                                .addOption(OptionType.STRING, "duration",
+                                        "The amount of time until the poll stops accepting new responses",
+                                        false).addOption(OptionType.BOOLEAN, "announce",
+                                        "Whether the winning option(s) should be announced when the poll ends",
+                                        false).addOption(OptionType.STRING, "color",
+                                        "The hexadecimal accent color of the poll's embed (e.g. 4372AA)"),
+                        Commands.slash("role-assigner",
+                                        "Allows users to self-assign roles by reacting to a message")
+                                .addOption(OptionType.STRING, "title", "The title of the role assigner",
+                                        true).addOption(OptionType.ROLE, "role1", "Role 1", true)
+                                .addOption(OptionType.ROLE, "role2", "Role 2", false)
+                                .addOption(OptionType.ROLE, "role3", "Role 3", false)
+                                .addOption(OptionType.ROLE, "role4", "Role 4", false)
+                                .addOption(OptionType.ROLE, "role5", "Role 5", false)
+                                .addOption(OptionType.ROLE, "role6", "Role 6", false)
+                                .addOption(OptionType.ROLE, "role7", "Role 7", false)
+                                .addOption(OptionType.ROLE, "role8", "Role 8", false)
+                                .addOption(OptionType.ROLE, "role9", "Role 9", false)
+                                .addOption(OptionType.ROLE, "role10", "Role 10", false)
+                                .addOption(OptionType.STRING, "label1", "Emoji label for role 1", false)
+                                .addOption(OptionType.STRING, "label2", "Emoji label for role 2", false)
+                                .addOption(OptionType.STRING, "label3", "Emoji label for role 3", false)
+                                .addOption(OptionType.STRING, "label4", "Emoji label for role 4", false)
+                                .addOption(OptionType.STRING, "label5", "Emoji label for role 5", false)
+                                .addOption(OptionType.STRING, "label6", "Emoji label for role 6", false)
+                                .addOption(OptionType.STRING, "label7", "Emoji label for role 7", false)
+                                .addOption(OptionType.STRING, "label8", "Emoji label for role 8", false)
+                                .addOption(OptionType.STRING, "label9", "Emoji label for role 9", false)
+                                .addOption(OptionType.STRING, "label10", "Emoji label for role 10", false)
+                                .addOption(OptionType.STRING, "color",
+                                        "The hexadecimal accent color of the role assigner's embed (e.g. 4372AA)")
+                                .addOption(OptionType.STRING, "image",
+                                        "The URL of an image to use as a thumbnail"),
+                        Commands.slash("settings", "Modifies server settings for the bot")
+                                .addOption(OptionType.ROLE, "poll-role",
+                                        "Users with this role can create polls.", false)
+                                .addOption(OptionType.STRING, "default-poll-color",
+                                        "The default hexadecimal accent color for poll embeds (e.g. 4372AA)",
+                                        false).addOption(OptionType.ROLE, "auto-assign-role",
+                                        "Automatically assign this role to new users when they join", false))
+                .queue();
     }
 
     private static void loadConfig() throws IOException {

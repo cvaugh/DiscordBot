@@ -6,6 +6,7 @@ public class GuildSettings {
     public long id;
     public long roleToCreatePoll = 0;
     public int defaultEmbedColor = Integer.MAX_VALUE;
+    public long autoAssignRole = 0;
 
     public Color getEmbedColor() {
         return defaultEmbedColor == Integer.MAX_VALUE ?
