@@ -18,7 +18,6 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
-import net.dv8tion.jda.api.events.session.ShutdownEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.utils.TimeFormat;
@@ -95,7 +94,7 @@ public class DiscordListener extends ListenerAdapter {
                         .queue();
                 return;
             }
-            if(!checkCanMute(event, guild, true))
+            if(!checkCanMute(event, guild, false))
                 return;
             OptionMapping toMute = event.getOption("user");
             if(toMute == null) {
@@ -115,8 +114,8 @@ public class DiscordListener extends ListenerAdapter {
             }
             Guilds.get(guild.getIdLong()).mute(toMute.getAsUser().getIdLong(), end);
             event.reply(toMute.getAsUser().getAsMention() + " has been muted until " +
-                            TimeFormat.DATE_LONG.format(end) + " at " + TimeFormat.TIME_LONG.format(end))
-                    .queue();
+                    TimeFormat.DATE_LONG.format(end) + " at " + TimeFormat.TIME_LONG.format(end) +
+                    " (" + TimeFormat.RELATIVE.format(end) + ")").queue();
         }
         case "unmute" -> {
             Guild guild = event.getGuild();
@@ -351,11 +350,6 @@ public class DiscordListener extends ListenerAdapter {
         }
     }
 
-    @Override
-    public void onShutdown(@NotNull ShutdownEvent event) {
-        System.out.println("SHUTDOWN");
-    }
-
     private static void handlePollCommand(SlashCommandInteractionEvent event) {
         Guild guild = event.getGuild();
         if(guild == null) {
@@ -467,7 +461,7 @@ public class DiscordListener extends ListenerAdapter {
         Poll poll = Poll.REGISTRY.get(event.getMessageIdLong());
         if(poll.closed || poll.results.containsKey(event.getUserIdLong())) {
             TextChannel channel = Main.jda.getTextChannelById(poll.channelId);
-            if(channel != null) {
+            if(channel != null && event.getUser() != null) {
                 channel.removeReactionById(poll.id, event.getEmoji(), event.getUser()).complete();
             }
             return;
