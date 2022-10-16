@@ -189,13 +189,6 @@ public class DiscordListener extends ListenerAdapter {
     public void onGuildMemberJoin(@NotNull GuildMemberJoinEvent event) {
         long roleId = Guilds.get(event.getGuild().getIdLong()).autoAssignRole;
         Role role = event.getGuild().getRoleById(roleId);
-        System.out.println("event.getMember() = " + event.getMember());
-        System.out.println(
-                "event.getMember().getAsMention() = " + event.getMember().getAsMention());
-        System.out.println(
-                "event.getMember().getActiveClients() = " + event.getMember().getActiveClients());
-        System.out.println(
-                "event.getMember().getTimeCreated() = " + event.getMember().getTimeCreated());
         if(role == null)
             return;
         event.getGuild()
