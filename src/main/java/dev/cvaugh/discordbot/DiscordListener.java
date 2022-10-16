@@ -18,10 +18,6 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
-import net.dv8tion.jda.api.events.session.SessionDisconnectEvent;
-import net.dv8tion.jda.api.events.session.SessionInvalidateEvent;
-import net.dv8tion.jda.api.events.session.SessionRecreateEvent;
-import net.dv8tion.jda.api.events.session.SessionResumeEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.utils.TimeFormat;
@@ -346,26 +342,6 @@ public class DiscordListener extends ListenerAdapter {
         if(Guilds.get(event.getGuild().getIdLong()).isMuted(event.getAuthor().getIdLong())) {
             event.getMessage().delete().queue();
         }
-    }
-
-    @Override
-    public void onSessionInvalidate(@NotNull SessionInvalidateEvent event) {
-        Logger.warn("SessionInvalidateEvent");
-    }
-
-    @Override
-    public void onSessionDisconnect(@NotNull SessionDisconnectEvent event) {
-        Logger.warn("SessionDisconnectEvent");
-    }
-
-    @Override
-    public void onSessionResume(@NotNull SessionResumeEvent event) {
-        Logger.warn("SessionResumeEvent");
-    }
-
-    @Override
-    public void onSessionRecreate(@NotNull SessionRecreateEvent event) {
-        Logger.warn("SessionRecreateEvent");
     }
 
     private static void handlePollCommand(SlashCommandInteractionEvent event) {
