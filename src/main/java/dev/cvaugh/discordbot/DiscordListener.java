@@ -31,11 +31,11 @@ import java.util.concurrent.ThreadLocalRandom;
 public class DiscordListener extends ListenerAdapter {
     @Override
     public void onReady(@NotNull ReadyEvent event) {
-        Logger.info("Ready event received");
+        Main.logger.info("Ready event received");
         for(Guild guild : Main.jda.getGuilds()) {
             long id = guild.getIdLong();
             if(!Guilds.hasEntry(id)) {
-                Logger.warn("Creating missing settings.json for guild %d", id);
+                Main.logger.warn("Creating missing settings.json for guild {}", id);
                 Guilds.put(id);
             }
         }
@@ -296,7 +296,7 @@ public class DiscordListener extends ListenerAdapter {
 
     @Override
     public void onGuildJoin(@NotNull GuildJoinEvent event) {
-        Logger.info("Joined guild: %s (ID %d)", event.getGuild().getName(),
+        Main.logger.info("Joined guild: {} (ID {})", event.getGuild().getName(),
                 event.getGuild().getIdLong());
         Guilds.put(event.getGuild().getIdLong());
     }

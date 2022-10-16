@@ -34,7 +34,8 @@ public class Config {
         try {
             return new Color(Integer.parseInt(instance.defaultEmbedColor, 16));
         } catch(NumberFormatException e) {
-            Logger.warn("Invalid color code (defaultEmbedColor): %s", instance.defaultEmbedColor);
+            Main.logger.warn("Invalid color code (defaultEmbedColor): {}",
+                    instance.defaultEmbedColor);
             return Color.DARK_GRAY;
         }
     }

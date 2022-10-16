@@ -8,6 +8,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -27,7 +29,6 @@ public class Main {
     private static final File ROLE_ASSIGNERS_DIR = new File(CONFIG_DIR, "role-assigners");
     private static final File GUILDS_DIR = new File(CONFIG_DIR, "guilds");
     private static final Timer TIMER = new Timer();
-    private static final long POLL_UPDATE_FREQUENCY = 300000L;
     private static final TimerTask UPDATE_TASK = new TimerTask() {
         @Override
         public void run() {
@@ -36,11 +37,13 @@ public class Main {
             }
         }
     };
+    public static Logger logger;
     public static JDA jda;
     public static Gson gson;
     public static String helpText = "";
 
     public static void main(String[] args) {
+        logger = LoggerFactory.getLogger("dev.cvaugh.discordbot.Main");
         gson = new Gson();
         try {
             readHelpText();
@@ -122,6 +125,7 @@ public class Main {
                         .addOption(OptionType.STRING, "time", "How long to mute the user", true),
                 Commands.slash("unmute", "Unmutes a muted user")
                         .addOption(OptionType.USER, "user", "The user to unmute", true),
+                // TODO add/remove role command
                 Commands.slash("settings", "Modifies server settings for the bot")
                         .addOption(OptionType.ROLE, "role-to-poll",
                                 "Users with this role can create polls", false)
@@ -142,28 +146,28 @@ public class Main {
                         .addOption(OptionType.CHANNEL, "leave-message-channel",
                                 "The channel in which to send leave messages", false)).queue();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            Logger.info("Saving guild settings");
+            logger.info("Saving guild settings");
             Guilds.getAll().forEach(GuildSettings::save);
-            Logger.info("Saving polls");
+            logger.info("Saving polls");
             Poll.REGISTRY.values().forEach(Poll::save);
-            Logger.info("Saving role assigners");
+            logger.info("Saving role assigners");
             RoleAssigner.REGISTRY.values().forEach(RoleAssigner::save);
-            Logger.info("Shutting down");
+            logger.info("Shutting down");
         }));
     }
 
     private static void loadConfig() throws IOException {
-        Logger.info("Loading config");
+        logger.info("Loading config");
         if(!CONFIG_DIR.exists()) {
             if(!CONFIG_DIR.mkdirs()) {
-                Logger.error("Failed to create config directory at '%s'",
+                logger.error("Failed to create config directory at '{}'",
                         CONFIG_DIR.getAbsolutePath());
                 System.exit(1);
             }
         }
         if(!CONFIG_FILE.exists()) {
             writeDefaultConfig();
-            Logger.error("Please enter your bot token in '%s'", CONFIG_FILE.getAbsolutePath());
+            logger.error("Please enter your bot token in '{}'", CONFIG_FILE.getAbsolutePath());
             System.exit(1);
         }
         String json = Files.readString(CONFIG_FILE.toPath(), StandardCharsets.UTF_8);
@@ -171,7 +175,7 @@ public class Main {
     }
 
     private static void writeDefaultConfig() throws IOException {
-        Logger.info("Writing default config");
+        logger.info("Writing default config");
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         Files.writeString(CONFIG_FILE.toPath(), gson.toJson(Config.instance));
     }
@@ -187,7 +191,7 @@ public class Main {
     }
 
     private static void loadPolls() throws IOException {
-        Logger.info("Loading polls");
+        logger.info("Loading polls");
         if(!POLLS_DIR.exists())
             return;
         for(File file : POLLS_DIR.listFiles()) {
@@ -199,7 +203,7 @@ public class Main {
 
     public static void writePoll(Poll poll) throws IOException {
         if(!POLLS_DIR.exists() && !POLLS_DIR.mkdir()) {
-            Logger.error("Failed to create polls directory at '%s'", POLLS_DIR.getAbsolutePath());
+            logger.error("Failed to create polls directory at '{}'", POLLS_DIR.getAbsolutePath());
             System.exit(1);
         }
         File file = new File(POLLS_DIR, poll.id + ".json");
@@ -214,7 +218,7 @@ public class Main {
     }
 
     private static void loadRoleAssigners() throws IOException {
-        Logger.info("Loading role assigners");
+        logger.info("Loading role assigners");
         if(!ROLE_ASSIGNERS_DIR.exists())
             return;
         for(File file : ROLE_ASSIGNERS_DIR.listFiles()) {
@@ -227,7 +231,7 @@ public class Main {
 
     public static void writeRoleAssigner(RoleAssigner roleAssigner) throws IOException {
         if(!ROLE_ASSIGNERS_DIR.exists() && !ROLE_ASSIGNERS_DIR.mkdir()) {
-            Logger.error("Failed to create role assigners directory at '%s'",
+            logger.error("Failed to create role assigners directory at '{}'",
                     ROLE_ASSIGNERS_DIR.getAbsolutePath());
             System.exit(1);
         }
@@ -244,7 +248,7 @@ public class Main {
 
     private static void loadGuilds() throws IOException {
         if(!GUILDS_DIR.exists() && !GUILDS_DIR.mkdir()) {
-            Logger.error("Failed to guild data directory at '%s'", GUILDS_DIR.getAbsolutePath());
+            logger.error("Failed to guild data directory at '{}'", GUILDS_DIR.getAbsolutePath());
             System.exit(1);
         }
         for(File file : GUILDS_DIR.listFiles()) {
@@ -262,7 +266,7 @@ public class Main {
     private static File getGuildDir(long guildId) {
         File dir = new File(GUILDS_DIR, String.valueOf(guildId));
         if(!dir.exists() && !dir.mkdir()) {
-            Logger.error("Failed to create directory for guild %d at '%s'", guildId,
+            logger.error("Failed to create directory for guild {} at '{}'", guildId,
                     dir.getAbsolutePath());
             System.exit(1);
         }
