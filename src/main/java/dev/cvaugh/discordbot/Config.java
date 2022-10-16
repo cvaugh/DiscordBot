@@ -12,6 +12,7 @@ public class Config {
                     "\uD83C\uDDEB", "\uD83C\uDDEC", "\uD83C\uDDED", "\uD83C\uDDEE", "\uD83C\uDDEF");
     public int maxCoinFlips = 100;
     public String defaultEmbedColor = "4372AA";
+    public long updateTimerPeriod = 300;
 
     public static String getBotToken() {
         return instance.botToken;

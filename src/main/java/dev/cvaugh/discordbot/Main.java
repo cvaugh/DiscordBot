@@ -27,7 +27,7 @@ public class Main {
     private static final File GUILDS_DIR = new File(CONFIG_DIR, "guilds");
     private static final Timer TIMER = new Timer();
     private static final long POLL_UPDATE_FREQUENCY = 300000L;
-    private static final TimerTask POLL_UPDATE_TASK = new TimerTask() {
+    private static final TimerTask UPDATE_TASK = new TimerTask() {
         @Override
         public void run() {
             for(Poll poll : Poll.REGISTRY.values()) {
@@ -246,7 +246,7 @@ public class Main {
                 gson.toJson(Guilds.get(guildId)));
     }
 
-    public static void schedulePollUpdates() {
-        TIMER.schedule(POLL_UPDATE_TASK, 0L, POLL_UPDATE_FREQUENCY);
+    public static void startUpdateTask() {
+        TIMER.schedule(UPDATE_TASK, 0L, Config.instance.updateTimerPeriod * 1000L);
     }
 }

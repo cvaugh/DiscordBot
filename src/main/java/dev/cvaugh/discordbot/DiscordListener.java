@@ -34,7 +34,7 @@ public class DiscordListener extends ListenerAdapter {
                 Guilds.put(id);
             }
         }
-        Main.schedulePollUpdates();
+        Main.startUpdateTask();
     }
 
     @Override
