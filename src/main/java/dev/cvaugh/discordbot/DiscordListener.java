@@ -18,6 +18,10 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
+import net.dv8tion.jda.api.events.session.SessionDisconnectEvent;
+import net.dv8tion.jda.api.events.session.SessionInvalidateEvent;
+import net.dv8tion.jda.api.events.session.SessionRecreateEvent;
+import net.dv8tion.jda.api.events.session.SessionResumeEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.utils.TimeFormat;
@@ -45,9 +49,7 @@ public class DiscordListener extends ListenerAdapter {
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
         switch(event.getName()) {
-        case "help" -> {
-            event.reply(Main.helpText).setEphemeral(true).queue();
-        }
+        case "help" -> event.reply(Main.helpText).setEphemeral(true).queue();
         case "flipacoin" -> {
             EmbedBuilder eb = new EmbedBuilder();
             OptionMapping count = event.getOption("count");
@@ -84,9 +86,7 @@ public class DiscordListener extends ListenerAdapter {
                     .queue(response -> response.editOriginal(String.format("Response time: %d ms",
                             System.currentTimeMillis() - time)).queue());
         }
-        case "poll" -> {
-            handlePollCommand(event);
-        }
+        case "poll" -> handlePollCommand(event);
         case "mute" -> {
             Guild guild = event.getGuild();
             if(guild == null) {
@@ -134,9 +134,7 @@ public class DiscordListener extends ListenerAdapter {
             Guilds.get(guild.getIdLong()).unmute(toUnmute.getAsUser().getIdLong());
             event.reply(toUnmute.getAsUser().getAsMention() + " has been unmuted").queue();
         }
-        case "role-assigner" -> {
-            handleRoleAssignerCommand(event);
-        }
+        case "role-assigner" -> handleRoleAssignerCommand(event);
         case "settings" -> {
             Guild guild = event.getGuild();
             if(guild == null)
@@ -348,6 +346,26 @@ public class DiscordListener extends ListenerAdapter {
         if(Guilds.get(event.getGuild().getIdLong()).isMuted(event.getAuthor().getIdLong())) {
             event.getMessage().delete().queue();
         }
+    }
+
+    @Override
+    public void onSessionInvalidate(@NotNull SessionInvalidateEvent event) {
+        Logger.warn("SessionInvalidateEvent");
+    }
+
+    @Override
+    public void onSessionDisconnect(@NotNull SessionDisconnectEvent event) {
+        Logger.warn("SessionDisconnectEvent");
+    }
+
+    @Override
+    public void onSessionResume(@NotNull SessionResumeEvent event) {
+        Logger.warn("SessionResumeEvent");
+    }
+
+    @Override
+    public void onSessionRecreate(@NotNull SessionRecreateEvent event) {
+        Logger.warn("SessionRecreateEvent");
     }
 
     private static void handlePollCommand(SlashCommandInteractionEvent event) {

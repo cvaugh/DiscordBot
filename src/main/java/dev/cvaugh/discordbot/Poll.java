@@ -119,9 +119,7 @@ public class Poll {
                 channel.sendMessage("**Poll results:**\n" + sb.toString().trim())
                         .setMessageReference(id).queue();
             }
-            channel.editMessageEmbedsById(id, build()).queue(success -> {
-                save();
-            }, error -> {
+            channel.editMessageEmbedsById(id, build()).queue(success -> save(), error -> {
                 if(error instanceof ErrorResponseException e) {
                     if(e.getErrorResponse() == ErrorResponse.UNKNOWN_MESSAGE) {
                         deletePoll(id);

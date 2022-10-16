@@ -16,21 +16,11 @@ public final class Utils {
             char c = Character.toLowerCase(s.charAt(s.length() - 1));
             s = s.substring(0, s.length() - 1);
             switch(c) {
-            case 'y' -> {
-                years += Integer.parseInt(s);
-            }
-            case 'd' -> {
-                days += Integer.parseInt(s);
-            }
-            case 'h' -> {
-                hours += Integer.parseInt(s);
-            }
-            case 'm' -> {
-                minutes += Integer.parseInt(s);
-            }
-            case 's' -> {
-                seconds += Integer.parseInt(s);
-            }
+            case 'y' -> years += Integer.parseInt(s);
+            case 'd' -> days += Integer.parseInt(s);
+            case 'h' -> hours += Integer.parseInt(s);
+            case 'm' -> minutes += Integer.parseInt(s);
+            case 's' -> seconds += Integer.parseInt(s);
             default -> {return 0L;}
             }
         }
