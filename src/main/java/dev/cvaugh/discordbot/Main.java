@@ -200,7 +200,10 @@ public class Main {
         logger.info("Loading polls");
         if(!POLLS_DIR.exists())
             return;
-        for(File file : POLLS_DIR.listFiles()) {
+        File[] files = POLLS_DIR.listFiles();
+        if(files == null)
+            return;
+        for(File file : files) {
             logger.debug("Loading poll {}", file.getName());
             Poll poll = gson.fromJson(Files.readString(file.toPath(), StandardCharsets.UTF_8),
                     Poll.class);
@@ -218,19 +221,22 @@ public class Main {
         Files.writeString(file.toPath(), gson.toJson(poll));
     }
 
-    public static boolean deletePoll(long id) {
+    public static void deletePoll(long id) {
         logger.debug("Deleting poll {}", id);
         File file = new File(POLLS_DIR, id + ".json");
-        if(file.exists())
-            return file.delete();
-        return true;
+        if(file.exists() && !file.delete()) {
+            logger.warn("Failed to delete poll {} ({})", id, file.getAbsolutePath());
+        }
     }
 
     private static void loadRoleAssigners() throws IOException {
         logger.info("Loading role assigners");
         if(!ROLE_ASSIGNERS_DIR.exists())
             return;
-        for(File file : ROLE_ASSIGNERS_DIR.listFiles()) {
+        File[] files = ROLE_ASSIGNERS_DIR.listFiles();
+        if(files == null)
+            return;
+        for(File file : files) {
             logger.debug("Loading role assigner {}", file.getName());
             RoleAssigner roleAssigner =
                     gson.fromJson(Files.readString(file.toPath(), StandardCharsets.UTF_8),
@@ -250,12 +256,12 @@ public class Main {
         Files.writeString(file.toPath(), gson.toJson(roleAssigner));
     }
 
-    public static boolean deleteRoleAssigner(long id) {
+    public static void deleteRoleAssigner(long id) {
         logger.debug("Deleting role assigner {}", id);
         File file = new File(ROLE_ASSIGNERS_DIR, id + ".json");
-        if(file.exists())
-            return file.delete();
-        return true;
+        if(file.exists() && !file.delete()) {
+            logger.warn("Failed to delete role assigner {} ({})", id, file.getAbsolutePath());
+        }
     }
 
     private static void loadGuilds() throws IOException {
@@ -264,7 +270,10 @@ public class Main {
             logger.error("Failed to guild data directory at '{}'", GUILDS_DIR.getAbsolutePath());
             System.exit(1);
         }
-        for(File file : GUILDS_DIR.listFiles()) {
+        File[] files = GUILDS_DIR.listFiles();
+        if(files == null)
+            return;
+        for(File file : files) {
             if(file.isDirectory()) {
                 logger.debug("Loading guild " + file.getName());
                 File settingsFile = new File(file, "settings.json");
