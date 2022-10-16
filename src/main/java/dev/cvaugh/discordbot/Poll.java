@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 public class Poll {
-    public static final Map<Long, Poll> POLLS = new HashMap<>();
+    public static final Map<Long, Poll> REGISTRY = new HashMap<>();
     public long id;
     public long createdAt;
     public long guildId;
@@ -50,7 +50,7 @@ public class Poll {
         }
         EmbedBuilder eb = new EmbedBuilder();
         eb.setColor(accentColor == Integer.MAX_VALUE ?
-                Guilds.get(guildId).getPollEmbedColor() :
+                Guilds.get(guildId).getEmbedColor() :
                 new Color(accentColor));
         eb.setTitle("Poll: " + title);
 
@@ -150,9 +150,9 @@ public class Poll {
     }
 
     public static void deletePoll(long id) {
-        if(!POLLS.containsKey(id))
+        if(!REGISTRY.containsKey(id))
             return;
-        POLLS.remove(id);
+        REGISTRY.remove(id);
         Main.deletePoll(id);
     }
 }

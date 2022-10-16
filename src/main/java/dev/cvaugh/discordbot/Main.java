@@ -23,13 +23,14 @@ public class Main {
     private static final File CONFIG_DIR = new File("bot");
     private static final File CONFIG_FILE = new File(CONFIG_DIR, "config.json");
     private static final File POLLS_DIR = new File(CONFIG_DIR, "polls");
+    private static final File ROLE_ASSIGNERS_DIR = new File(CONFIG_DIR, "role-assigners");
     private static final File GUILDS_DIR = new File(CONFIG_DIR, "guilds");
     private static final Timer TIMER = new Timer();
     private static final long POLL_UPDATE_FREQUENCY = 300000L;
     private static final TimerTask POLL_UPDATE_TASK = new TimerTask() {
         @Override
         public void run() {
-            for(Poll poll : Poll.POLLS.values()) {
+            for(Poll poll : Poll.REGISTRY.values()) {
                 poll.update();
             }
         }
@@ -45,6 +46,7 @@ public class Main {
             loadConfig();
             loadGuilds();
             loadPolls();
+            loadRoleAssigners();
         } catch(IOException e) {
             e.printStackTrace();
         }
@@ -53,8 +55,7 @@ public class Main {
                 GatewayIntent.GUILD_MESSAGE_REACTIONS, GatewayIntent.MESSAGE_CONTENT);
         jda = builder.build();
         jda.addEventListener(new DiscordListener());
-        jda.updateCommands().addCommands(
-                Commands.slash("help", "Shows the bot's documentation"),
+        jda.updateCommands().addCommands(Commands.slash("help", "Shows the bot's documentation"),
                 Commands.slash("flipacoin", "Flips a coin")
                         .addOption(OptionType.INTEGER, "count", "How many coins to flip", false),
                 Commands.slash("ping",
@@ -87,7 +88,34 @@ public class Main {
                                 "Whether the winning option(s) should be announced when the poll ends",
                                 false).addOption(OptionType.STRING, "color",
                                 "The hexadecimal accent color of the poll's embed (e.g. 4372AA)"),
-                Commands.slash("settings", "Modifies server settings for the bot.")
+                Commands.slash("role-assigner",
+                                "Allows users to self-assign roles by reacting to a message")
+                        .addOption(OptionType.STRING, "title", "The title of the role assigner",
+                                true).addOption(OptionType.ROLE, "role1", "Role 1", true)
+                        .addOption(OptionType.ROLE, "role2", "Role 2", false)
+                        .addOption(OptionType.ROLE, "role3", "Role 3", false)
+                        .addOption(OptionType.ROLE, "role4", "Role 4", false)
+                        .addOption(OptionType.ROLE, "role5", "Role 5", false)
+                        .addOption(OptionType.ROLE, "role6", "Role 6", false)
+                        .addOption(OptionType.ROLE, "role7", "Role 7", false)
+                        .addOption(OptionType.ROLE, "role8", "Role 8", false)
+                        .addOption(OptionType.ROLE, "role9", "Role 9", false)
+                        .addOption(OptionType.ROLE, "role10", "Role 10", false)
+                        .addOption(OptionType.STRING, "label1", "Emoji label for role 1", false)
+                        .addOption(OptionType.STRING, "label2", "Emoji label for role 2", false)
+                        .addOption(OptionType.STRING, "label3", "Emoji label for role 3", false)
+                        .addOption(OptionType.STRING, "label4", "Emoji label for role 4", false)
+                        .addOption(OptionType.STRING, "label5", "Emoji label for role 5", false)
+                        .addOption(OptionType.STRING, "label6", "Emoji label for role 6", false)
+                        .addOption(OptionType.STRING, "label7", "Emoji label for role 7", false)
+                        .addOption(OptionType.STRING, "label8", "Emoji label for role 8", false)
+                        .addOption(OptionType.STRING, "label9", "Emoji label for role 9", false)
+                        .addOption(OptionType.STRING, "label10", "Emoji label for role 10", false)
+                        .addOption(OptionType.STRING, "color",
+                                "The hexadecimal accent color of the role assigner's embed (e.g. 4372AA)")
+                        .addOption(OptionType.STRING, "image",
+                                "The URL of an image to use as a thumbnail"),
+                Commands.slash("settings", "Modifies server settings for the bot")
                         .addOption(OptionType.ROLE, "poll-role",
                                 "Users with this role can create polls.", false)
                         .addOption(OptionType.STRING, "default-poll-color",
@@ -136,7 +164,7 @@ public class Main {
         for(File file : POLLS_DIR.listFiles()) {
             Poll poll = gson.fromJson(Files.readString(file.toPath(), StandardCharsets.UTF_8),
                     Poll.class);
-            Poll.POLLS.put(poll.id, poll);
+            Poll.REGISTRY.put(poll.id, poll);
         }
     }
 
@@ -151,6 +179,35 @@ public class Main {
 
     public static boolean deletePoll(long id) {
         File file = new File(POLLS_DIR, id + ".json");
+        if(file.exists())
+            return file.delete();
+        return true;
+    }
+
+    private static void loadRoleAssigners() throws IOException {
+        Logger.info("Loading role assigners");
+        if(!ROLE_ASSIGNERS_DIR.exists())
+            return;
+        for(File file : ROLE_ASSIGNERS_DIR.listFiles()) {
+            RoleAssigner roleAssigner =
+                    gson.fromJson(Files.readString(file.toPath(), StandardCharsets.UTF_8),
+                            RoleAssigner.class);
+            RoleAssigner.REGISTRY.put(roleAssigner.id, roleAssigner);
+        }
+    }
+
+    public static void writeRoleAssigner(RoleAssigner roleAssigner) throws IOException {
+        if(!ROLE_ASSIGNERS_DIR.exists() && !ROLE_ASSIGNERS_DIR.mkdir()) {
+            Logger.error("Failed to create role assigners directory at '%s'",
+                    ROLE_ASSIGNERS_DIR.getAbsolutePath());
+            System.exit(1);
+        }
+        File file = new File(ROLE_ASSIGNERS_DIR, roleAssigner.id + ".json");
+        Files.writeString(file.toPath(), gson.toJson(roleAssigner));
+    }
+
+    public static boolean deleteRoleAssigner(long id) {
+        File file = new File(ROLE_ASSIGNERS_DIR, id + ".json");
         if(file.exists())
             return file.delete();
         return true;

@@ -11,7 +11,7 @@ public class Config {
             List.of("\uD83C\uDDE6", "\uD83C\uDDE7", "\uD83C\uDDE8", "\uD83C\uDDE9", "\uD83C\uDDEA",
                     "\uD83C\uDDEB", "\uD83C\uDDEC", "\uD83C\uDDED", "\uD83C\uDDEE", "\uD83C\uDDEF");
     public int maxCoinFlips = 100;
-    public String pollEmbedColor = "4372AA";
+    public String defaultEmbedColor = "4372AA";
 
     public static String getBotToken() {
         return instance.botToken;
@@ -29,12 +29,12 @@ public class Config {
         return instance.maxCoinFlips;
     }
 
-    public static Color getPollEmbedColor() {
+    public static Color getEmbedColor() {
         try {
-            return new Color(Integer.parseInt(instance.pollEmbedColor, 16));
+            return new Color(Integer.parseInt(instance.defaultEmbedColor, 16));
         } catch(NumberFormatException e) {
-            Logger.warn("Invalid color code (pollEmbedColor): %s", instance.pollEmbedColor);
-            return Color.BLACK;
+            Logger.warn("Invalid color code (defaultEmbedColor): %s", instance.defaultEmbedColor);
+            return Color.DARK_GRAY;
         }
     }
 }

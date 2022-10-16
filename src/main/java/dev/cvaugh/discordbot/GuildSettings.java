@@ -5,11 +5,11 @@ import java.awt.Color;
 public class GuildSettings {
     public long id;
     public long roleToCreatePoll = 0;
-    public int defaultPollEmbedColor = Integer.MAX_VALUE;
+    public int defaultEmbedColor = Integer.MAX_VALUE;
 
-    public Color getPollEmbedColor() {
-        return defaultPollEmbedColor == Integer.MAX_VALUE ?
-                Config.getPollEmbedColor() :
-                new Color(defaultPollEmbedColor);
+    public Color getEmbedColor() {
+        return defaultEmbedColor == Integer.MAX_VALUE ?
+                Config.getEmbedColor() :
+                new Color(defaultEmbedColor);
     }
 }
