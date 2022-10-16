@@ -141,6 +141,15 @@ public class Main {
                                 "Send a message when a user leaves the server", false)
                         .addOption(OptionType.CHANNEL, "leave-message-channel",
                                 "The channel in which to send leave messages", false)).queue();
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            Logger.info("Saving guild settings");
+            Guilds.getAll().forEach(GuildSettings::save);
+            Logger.info("Saving polls");
+            Poll.REGISTRY.values().forEach(Poll::save);
+            Logger.info("Saving role assigners");
+            RoleAssigner.REGISTRY.values().forEach(RoleAssigner::save);
+            Logger.info("Shutting down");
+        }));
     }
 
     private static void loadConfig() throws IOException {

@@ -18,6 +18,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
+import net.dv8tion.jda.api.events.session.ShutdownEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.utils.TimeFormat;
@@ -348,6 +349,11 @@ public class DiscordListener extends ListenerAdapter {
         if(Guilds.get(event.getGuild().getIdLong()).isMuted(event.getAuthor().getIdLong())) {
             event.getMessage().delete().queue();
         }
+    }
+
+    @Override
+    public void onShutdown(@NotNull ShutdownEvent event) {
+        System.out.println("SHUTDOWN");
     }
 
     private static void handlePollCommand(SlashCommandInteractionEvent event) {

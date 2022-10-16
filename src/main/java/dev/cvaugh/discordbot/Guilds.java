@@ -1,6 +1,7 @@
 package dev.cvaugh.discordbot;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,6 +14,10 @@ public final class Guilds {
 
     public static GuildSettings get(long id) {
         return REGISTRY.get(id);
+    }
+
+    public static Collection<GuildSettings> getAll() {
+        return REGISTRY.values();
     }
 
     public static void put(long id, GuildSettings settings, boolean save) {
